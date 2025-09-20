@@ -6,7 +6,7 @@
 void main(void)
 {
 	
-	GetFlashConfig();  //默认配置初始化
+	GetFlashConfig();  //默认配置初始化//
 	
 	BSP_Init();//板载硬件初始化,	
 	
