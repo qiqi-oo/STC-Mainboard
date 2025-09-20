@@ -1,0 +1,352 @@
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP
+OBJECT MODULE PLACED IN .\Objects\bsp.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Bsp\bsp.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\bsp.lst) TABS(2) OBJECT(.\Objects\bsp.obj)
+
+line level    source
+
+   1          #include "./User/includes.h"
+   2          #include "stdio.h"
+   3          
+   4          code u32 bote[]={0,115200,38400,19200,9600,4800,2400};
+   5          //========================================================================
+   6          // 函数: void BSP_Init(void)
+   7          // 描述: 板载相关硬件初始化函数汇总，将需要初始化的硬件全部在此处初始化�
+             -�最终被main函数所调用
+   8          // 版本: V1.0, 2022-10-17
+   9          //========================================================================
+  10          void BSP_Init(void)
+  11          {
+  12   1        
+  13   1        BSP_GPIO_Init();//GPIO初始化
+  14   1        
+  15   1        BSP_ZhuansuCount_Init();//转速脉冲计数初始化
+  16   1        
+  17   1        BSP_LichengCount_Init();//里程脉冲计数初始化
+  18   1        
+  19   1        BSP_Usart_Init(DEBUG_USART,DEBUG_BAUDRATE); //初始化主板与上位机连接的串口
+  20   1        
+  21   1      #ifdef  STC12C5A60S2
+  22   1          P483 =0;//483接收状态
+  23   1      #endif  
+  24   1        
+  25   1      #if  CONSOLE_USART  
+  26   1        BSP_Usart_Init(CONSOLE_USART, CONSOLE_BAUDRATE);    //初始化printf打印输出的串口  
+  27   1      #endif  
+  28   1        
+  29   1      #ifdef  STC15W4K48S4  
+                BSP_Usart_Init(NETWORK_USART,NETWORK_BAUDRATE);//初始化网口
+              #endif  
+  32   1          
+  33   1        if(UPLOAD_USART != DISABLE)//flash里面配置了数据上传口
+  34   1        {
+  35   2            if(UPLOAD_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+  36   2            {
+  37   3              BSP_Usart_Init(UPLOAD_USART,bote[UPLOAD_BAUDRATE]); //初始化主板与上位机的连接串口
+  38   3              
+  39   3              USART_ClearMsgQueueRxBuffer(UPLOAD_USART);//清上传缓存
+  40   3              
+  41   3              USART_OpenInterrupt(UPLOAD_USART);//打开中断
+  42   3            }
+  43   2            if(pFlash->board.trigger_mode == 1)//判断数据触发模式是否为上电触发模式
+  44   2            {
+  45   3              Cmd_Start_Callback();
+  46   3              start = TURE;
+  47   3            }
+  48   2            
+  49   2        } 
+  50   1        
+  51   1        TOTAL_IT = TURE;//开启总中断
+  52   1        
+  53   1        
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 2   
+
+  54   1        
+  55   1      }
+  56          
+  57          //========================================================================
+  58          // 函数: void Cmd_Start_Callback(void)
+  59          // 描述: 主板收到55 aa 00 00 11 11 后会调用此函数
+  60          // 版本: V1.0, 2022-10-17
+  61          //========================================================================
+  62          void Cmd_Start_Callback(void)
+  63          {
+  64   1        
+  65   1        GetFlashConfig();//获取最新的配置文件
+  66   1        
+  67   1        //BSP_Init();     //按照最新的硬件配置初始化硬件信息
+  68   1        
+  69   1        if(UPLOAD_USART != DISABLE)//flash里面配置了数据上传口
+  70   1        {
+  71   2            if(UPLOAD_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+  72   2            {
+  73   3              BSP_Usart_Init(UPLOAD_USART,bote[UPLOAD_BAUDRATE]); //初始化主板与GPS连接的串口
+  74   3              
+  75   3              USART_ClearMsgQueueRxBuffer(UPLOAD_USART);//清上传缓存
+  76   3              
+  77   3              USART_OpenInterrupt(UPLOAD_USART);//打开中断
+  78   3            }
+  79   2              
+  80   2        }
+  81   1        
+  82   1      #ifdef  STC15W4K48S4  
+              
+                
+                if(GPS_USART != DISABLE)//flash里面配置了主板与GPS连接的串口
+                {
+                    if(UPLOAD_USART != GPS_USART)//如果上传串口是USART，GPS串口不能上传串口相同
+                    {
+                        if(GPS_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                        {
+                          BSP_Usart_Init(GPS_USART,bote[GPS_BAUDRATE]); //初始化主板与GPS连接的串口
+                          
+                          USART_OpenInterrupt(GPS_USART);//打开中断
+                          
+              
+                          if(pFlash->gps.remap > 0)//gps串口是否重映射
+                          {
+                              S1_USE_P16P17();//切换串口1到GPS串口
+                          }
+                        }
+                    }
+                
+                } 
+              
+                if(BUMP_HS_USART != DISABLE)//flash里面配置了主板与高森碰杆传感器之间连接的串口
+                {
+                    if(UPLOAD_USART != BUMP_HS_USART)//如果上传串口是USART，BUMP_HS_USART串口不能上传串口�
+             -�同
+                    {
+                      if(BUMP_HS_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                      {
+                        BSP_Usart_Init(BUMP_HS_USART,bote[BUMP_HS_BAUDRATE]); //初始化主板与高森碰杆传感器之间
+             -连接的串口
+                        
+                        USART_OpenInterrupt(BUMP_HS_USART);//打开中断
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 3   
+
+                      }
+                    }
+                }   
+              
+                if(BUMP_24G_USART != DISABLE)//flash里面配置了主板与2.4G碰杆传感器之间连接的串口
+                {
+                  if(UPLOAD_USART != BUMP_24G_USART)//如果上传串口是USART，BUMP_HS_USART串口不能上传串口�
+             -�同
+                  { 
+                      if(BUMP_24G_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                        {
+                          BSP_Usart_Init(BUMP_24G_USART,bote[BUMP_24G_BAUDRATE]); //初始化主板2.4G碰杆传感器之间�
+             -�接的串口
+                          
+                          USART_OpenInterrupt(BUMP_24G_BAUDRATE);//打开中断
+                        }
+                  }
+                      
+                } 
+                
+                if(TILT_ALL_USART != DISABLE)//flash里面配置了（汇总后）倾角传感器与主板连接的串口
+                {
+                  if(UPLOAD_USART != TILT_ALL_USART)//如果上传串口是USART，TILT_ALL_USART串口不能上传串口�
+             -��同
+                  { 
+                      if(TILT_ALL_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                      {
+                        BSP_Usart_Init(TILT_ALL_USART,bote[TILT_ALL_BAUDRATE]); //初始化（汇总后）倾角传感器与�
+             -��板连接的串口
+                        
+                        USART_OpenInterrupt(TILT_ALL_USART);//打开中断
+                      }
+                  }
+                } 
+                
+                if(TILT_Q_USART != DISABLE)//flash里面配置了车前轴倾角传感器与主板连接的串口
+                {
+                  if(UPLOAD_USART != TILT_Q_USART)//如果上传串口是USART，TILT_Q_USART串口不能上传串口相�
+             -�
+                  { 
+                     if(TILT_Q_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(TILT_Q_USART,bote[TILT_Q_BAUDRATE]); //初始化车前轴倾角传感器与主板连�
+             -�的串口
+                       
+                        USART_OpenInterrupt(TILT_Q_USART);//打开中断
+                     }
+                 }
+                } 
+                
+                if(TILT_H_USART != DISABLE)//flash里面配置了车后轴倾角传感器与主板连接的串口
+                {
+                  if(UPLOAD_USART != TILT_H_USART)//如果上传串口是USART，TILT_H_USART串口不能上传串口相�
+             -�
+                  { 
+                     if(TILT_H_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(TILT_H_USART,bote[TILT_H_BAUDRATE]); //初始化车后轴倾角传感器与主板连�
+             -�的串口
+                       
+                        USART_OpenInterrupt(TILT_H_USART);//打开中断
+                     }
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 4   
+
+                 }
+                } 
+                
+                if(TILT_G_USART != DISABLE)//flash里面配置了车挂轴倾角传感器与主板连接的串口
+                {
+                  if(UPLOAD_USART != TILT_G_USART)//如果上传串口是USART，TILT_G_USART串口不能上传串口相�
+             -�
+                  { 
+                     if(TILT_G_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(TILT_G_USART,bote[TILT_G_BAUDRATE]); //初始化车挂轴倾角传感器与主板连�
+             -�的串口
+                       
+                        USART_OpenInterrupt(TILT_G_USART);//打开中断
+                     }
+                  }
+                } 
+                
+                if(TILT_MTC_USART != DISABLE)//flash里面配置了二轮摩托车倾角传感器与主板连接的串口
+                {
+                  if(UPLOAD_USART != TILT_MTC_USART)//如果上传串口是USART，TILT_MTC_USART串口不能上传串口�
+             -��同
+                  { 
+                     if(TILT_MTC_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(TILT_MTC_USART,bote[TILT_MTC_BAUDRATE]); //初始化二轮摩托车倾角传感器与�
+             -��板连接的串口
+                       
+                        USART_OpenInterrupt(TILT_MTC_USART);//打开中断
+                     }
+                 }
+                } 
+                
+                if(CSB_DBQ_USART != DISABLE)//flash里面配置了//主板与超声波传感器（单边桥）连接的�
+             -�口号
+                {
+                  if(UPLOAD_USART != CSB_DBQ_USART)//如果上传串口是USART，CSB_DBQ_USART串口不能上传串口相
+             -同
+                  { 
+                     if(CSB_DBQ_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(CSB_DBQ_USART,bote[CSB_DBQ_BAUDRATE]); //主板与超声波传感器（单边桥）连
+             -接的串口号
+                       
+                        USART_OpenInterrupt(CSB_DBQ_USART);//打开中断
+                     }
+                  }
+                }
+              
+                if(CSB_SD_USART != DISABLE)//flash里面配置了//主板与超声波传感器（隧道）连接的串口
+             -号
+                {
+                  if(UPLOAD_USART != CSB_SD_USART)//如果上传串口是USART，CSB_SD_USART串口不能上传串口相�
+             -�
+                  { 
+                     if(CSB_SD_BAUDRATE < (sizeof(bote)/sizeof(bote[0])))//校验波特率是否越界
+                     {
+                        BSP_Usart_Init(CSB_SD_USART,bote[CSB_SD_BAUDRATE]); //主板与超声波传感器（隧道）连接�
+             -�串口号
+                       
+                        USART_OpenInterrupt(CSB_SD_USART);//打开中断
+                     }
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 5   
+
+                  }
+                }   
+                
+                
+                GetTilt_Adjust_vaule();//获取传二轮摩托车传感器的基准值
+                
+              
+              #endif  
+ 228   1        
+ 229   1      
+ 230   1      }
+ 231          
+ 232          //========================================================================
+ 233          // 函数: void Cmd_Stop_Callback(void)
+ 234          // 描述: 主板收到55 aa 00 00 00 00 后会调用此函数
+ 235          // 版本: V1.0, 2022-10-17
+ 236          //========================================================================
+ 237          void Cmd_Stop_Callback(void)
+ 238          {
+ 239   1        
+ 240   1      #ifdef  STC15W4K48S4
+                
+                //关闭已经已经初始化外设的中断，防止串口缓存溢出
+                
+                if(GPS_USART != DISABLE)//flash里面配置了主板与GPS连接的串口
+                {   
+                  //USART_CloseInterrupt(GPS_USART);//关闭串口中断！
+                  S1_USE_P30P31();//串口切换回默认串口
+                }
+                
+                if(BUMP_HS_USART != DISABLE)//flash里面配置了主板与高森碰杆传感器之间连接的串口 
+                {   
+                  USART_CloseInterrupt(BUMP_HS_USART);//关闭串口中断！
+                }
+                
+                if(BUMP_24G_USART != DISABLE)//flash里面配置了主板与2.4G碰杆传感器之间连接的串口
+                { 
+                  USART_CloseInterrupt(BUMP_24G_USART);//关闭串口中断！
+                }
+                  
+                if(TILT_ALL_USART != DISABLE)//flash里面配置了（汇总后）倾角传感器与主板连接的串口
+                {
+                  USART_CloseInterrupt(TILT_ALL_USART);//关闭串口中断！
+                }
+                
+                if(TILT_Q_USART != DISABLE)//flash里面配置了车前轴倾角传感器与主板连接的串口
+                {
+                  USART_CloseInterrupt(TILT_Q_USART);//关闭串口中断！
+                } 
+                
+                if(TILT_H_USART != DISABLE)//flash里面配置了车后轴倾角传感器与主板连接的串口
+                { 
+                  USART_CloseInterrupt(TILT_H_USART);//关闭串口中断！
+                }
+                
+                if(TILT_G_USART != DISABLE)//flash里面配置了车挂轴倾角传感器与主板连接的串口
+                { 
+                  USART_CloseInterrupt(TILT_G_USART);//关闭串口中断！
+                }
+                
+                if(TILT_MTC_USART != DISABLE)//flash里面配置了二轮摩托车倾角传感器与主板连接的串口
+                { 
+C51 COMPILER V9.60.0.0   BSP                                                               09/20/2025 15:17:34 PAGE 6   
+
+                  USART_CloseInterrupt(TILT_MTC_USART);//关闭串口中断！
+                }   
+                
+                if(CSB_SD_USART != DISABLE)//flash里面配置了主板与超声波传感器（隧道）连接的串口�
+             -�
+                { 
+                  USART_CloseInterrupt(CSB_SD_USART);//关闭串口中断！
+                }
+                
+                if(CSB_DBQ_USART != DISABLE)//flash里面配置了主板与超声波传感器（单边桥）连接的串�
+             -��号
+                { 
+                  USART_CloseInterrupt(CSB_DBQ_USART);//关闭串口中断！
+                }   
+              #endif
+ 295   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    291    ----
+   CONSTANT SIZE    =     28    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

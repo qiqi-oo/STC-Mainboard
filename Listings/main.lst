@@ -1,0 +1,63 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              09/20/2025 15:17:36 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE User\main.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Li
+                    -stings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include  "./User/includes.h"
+   2          #include  "./User/config.h"
+   3          #include  <stdio.h>
+   4          #include  <string.h>
+   5          
+   6          void main(void)
+   7          {
+   8   1        
+   9   1        GetFlashConfig();  //默认配置初始化
+  10   1        
+  11   1        BSP_Init();//板载硬件初始化, 
+  12   1        
+  13   1        Check_Serial_Id();  //校验单片机序列号
+  14   1        
+  15   1        while(1)  
+  16   1        { 
+  17   2          
+  18   2          #ifdef  STC15W4K48S4  
+                  SerialHandle(NETWORK_USART); //网口通讯处理程序
+                  #endif
+  21   2          SerialHandle(DEBUG_USART);    //串口通讯处理程序  
+  22   2          
+  23   2          SerialHandle(UPLOAD_USART);   //串口通讯处理程序  
+  24   2          
+  25   2          SerialDataUpload(UPLOAD_USART);//给上位机上传数据
+  26   2          
+  27   2          #ifdef  STC12C5A60S2  
+  28   2            delay_ms(200);
+  29   2          #endif
+  30   2          
+  31   2          
+  32   2          
+  33   2          
+  34   2        } 
+  35   1      }
+  36          
+  37          
+  38          
+  39          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     59    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,94 @@
+C51 COMPILER V9.60.0.0   BSP_MCU_ID                                                        09/20/2025 15:17:35 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP_MCU_ID
+OBJECT MODULE PLACED IN .\Objects\bsp_mcu_id.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Bsp\bsp_mcu_id.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT
+                    -(.\Listings\bsp_mcu_id.lst) TABS(2) OBJECT(.\Objects\bsp_mcu_id.obj)
+
+line level    source
+
+   1          #include <stdio.h>
+   2          #include "./User/includes.h"
+   3          #include <string.h>
+   4          
+   5          #define ID_ADDR_RAM 0xF1                //STC系列ID号的存放在RAM区的地址
+   6          //#define ID_ADDR_ROM 0x03f9      //1K程序空间的MCU(如                                             S
+             -TC15F201EA, STC15F101EA)
+   7          //#define ID_ADDR_ROM 0x07f9      //2K程序空间的MCU(如                              STC15F402EACS, S
+             -TC15F202EA, STC15F102EA)
+   8          //#define ID_ADDR_ROM 0x0bf9      //3K程序空间的MCU(如                                             S
+             -TC15F203EA, STC15F103EA)
+   9          //#define ID_ADDR_ROM 0x0ff9      //4K程序空间的MCU(如               STC15F804EACS, STC15F404EACS, S
+             -TC15F204EA, STC15F104EA)
+  10          //#define ID_ADDR_ROM 0x13f9      //5K程序空间的MCU(如                                             S
+             -TC15F205EA, STC15F105EA)
+  11          //#define ID_ADDR_ROM 0x1ff9      //8K程序空间的MCU(如STC15F2K08S2,  STC15F808EACS, STC15F408EACS)
+  12          //#define ID_ADDR_ROM 0x27f9      //10K程序空间的MCU(如                             STC15F410EACS)
+  13          //#define ID_ADDR_ROM 0x2ff9      //12K程序空间的MCU(如              STC15F812EACS, STC15F412EACS)
+  14          //#define ID_ADDR_ROM 0x3ff9      //16K程序空间的MCU(如STC15F2K16S2, STC15F816EACS)
+  15          //#define ID_ADDR_ROM 0x4ff9      //20K程序空间的MCU(如STC15F2K20S2, STC15F820EACS)
+  16          //#define ID_ADDR_ROM 0x5ff9      //24K程序空间的MCU(如              STC15F824EACS)
+  17          //#define ID_ADDR_ROM 0x6ff9      //28K程序空间的MCU(如              STC15F828EACS)
+  18          //#define ID_ADDR_ROM 0x7ff9      //32K程序空间的MCU(如STC15F2K32S2)
+  19          //#define ID_ADDR_ROM 0x9ff9      //40K程序空间的MCU(如STC15F2K40S2)
+  20          #define ID_ADDR_ROM 0xbff9        //48K程序空间的MCU(如STC15F2K48S2)
+  21          //#define ID_ADDR_ROM 0xcff9      //52K程序空间的MCU(如STC15F2K52S2)
+  22          //#define ID_ADDR_ROM 0xdff9      //56K程序空间的MCU(如STC15F2K56S2)
+  23          //========================================================================
+  24          // 函数: BSP_GetlocalId(char *strid)
+  25          // 描述: 读取MCU芯片的序列号
+  26          // 参数：*strid[]指向串号保存的内存，保存格式为字符串
+  27          //       lenth  读取的串号长度，STC12系列/STC12系列,长度为7
+  28          // 返回: 无
+  29          // 版本: V1.0, 2022-10-17
+  30          //========================================================================
+  31          void BSP_GetlocalId(u8 *id)       //读取单片机ID信息
+  32          {
+  33   1          unsigned char idata *iptr;
+  34   1          //unsigned char code *cptr;
+  35   1          unsigned char i=0;
+  36   1            
+  37   1          iptr = ID_ADDR_RAM;                 //从RAM区读取ID号
+  38   1          for (i=0; i<7; i++)                 //读7个字节
+  39   1          {
+  40   2            *id++ = (*iptr++);      
+  41   2          }
+  42   1          
+  43   1      //    while(i)
+  44   1      //    {
+  45   1      //      
+  46   1      //      printf("ID = ");  
+  47   1      //      for (i=0; i<7; i++)                 //读7个字节
+  48   1      //      {
+  49   1      //        printf("%b02X",localid[i]); 
+C51 COMPILER V9.60.0.0   BSP_MCU_ID                                                        09/20/2025 15:17:35 PAGE 2   
+
+  50   1      //            
+  51   1      //      }
+  52   1      //      printf("\r\n"); 
+  53   1      //      delay_ms(1000); 
+  54   1      //    }
+  55   1          
+  56   1          
+  57   1      //    cptr = ID_ADDR_ROM;               //从程序区读取ID号
+  58   1      //    for (i=0; i<7; i++)               //读7个字节
+  59   1      //    {
+  60   1      //        *id++ = (*cptr++);             //发送ID到串口
+  61   1      //    }     
+  62   1      }
+  63          /***********************************************************************/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     56    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,11 @@
+Build target 'mainboard'
+linking...
+Program Size: data=16.1 xdata=669 code=27159
+creating hex file from ".\Objects\STC"...
+User command #1: output.bat
+Version:34.4
+chip_type:#define STC12C5A60S2     
+"Output hex file:.\Obj\STC12-115200-V34.4.hex"
+移动了         1 个文件。
+".\Objects\STC" - 0 Error(s), 0 Warning(s).
+Build Time Elapsed:  00:00:01

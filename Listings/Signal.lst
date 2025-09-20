@@ -1,0 +1,1827 @@
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SIGNAL
+OBJECT MODULE PLACED IN .\Objects\Signal.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE App\Signal.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\L
+                    -istings\Signal.lst) TABS(2) OBJECT(.\Objects\Signal.obj)
+
+line level    source
+
+   1          #include  "./User/includes.h"
+   2          #include  "./User/config.h"
+   3          #include  <stdio.h>
+   4          #include  <string.h>
+   5          
+   6          
+   7          
+   8          #ifdef  STC15W4K48S4  
+              
+              xdata PengganTypeDef        pilepole = {0};//桩杆
+              xdata TiltSensorTypeDef     Tilt[4]={0};   //倾角传感器
+              xdata TiltAdjustTypeDef     mtc = {0};
+              xdata CsbTypeDef            csb_dbq = {0}; //超声波单边桥
+              xdata CsbTypeDef            csb_sd = {0};  //超声波隧道
+              #endif
+  16          
+  17          xdata u16 zhuansu=0;
+  18          xdata u16 licheng=0;
+  19          static u16 T0_count = 0;//获取转速计数器的值
+  20          xdata u8 dbugGearr = 0;//挡位调试数据
+  21          //========================================================================
+  22          // 函数: u8 zuozhuanxiangdeng(FlashParameterTypeDef *pFlash)
+  23          // 描述: 获取左转向灯信号,如开启双闪，返回FLASE
+  24          // 参数：pFlash
+  25          // 返回: 开启左转返回TURE，关闭左转返回FLASE
+  26          // 版本: V1.0, 2022-10-17
+  27          //========================================================================
+  28          static u8 zuozhuanxiangdeng(void)  //左转向灯 D1
+  29          {
+  30   1        xdata u8 zz_pin = BSP_ReadInputDataBit(&pFlash->zz);//读取输入状态
+  31   1        xdata u8 yz_pin = BSP_ReadInputDataBit(&pFlash->yz);//读取输入状态
+  32   1        
+  33   1        if(zz_pin == TURE && yz_pin == FALSE)
+  34   1            return TURE;
+  35   1        else 
+  36   1            return FALSE;
+  37   1      }
+  38          //========================================================================
+  39          // 函数: u8 youzhuanxiangdeng(void)
+  40          // 描述: 获取右转向灯信号,如开启双闪，返回FLASE
+  41          // 参数：pFlash
+  42          // 返回: 开启右转返回TURE，关闭左转返回FLASE
+  43          // 版本: V1.0, 2022-10-17
+  44          //========================================================================
+  45          static u8 youzhuanxiangdeng(void)  //右转向灯 D2
+  46          {
+  47   1        
+  48   1        xdata u8 zz_pin = BSP_ReadInputDataBit(&pFlash->zz);//读取输入状态
+  49   1        xdata u8 yz_pin = BSP_ReadInputDataBit(&pFlash->yz);//读取输入状态
+  50   1        
+  51   1        if(zz_pin == FALSE && yz_pin == TURE)
+  52   1            return TURE;
+  53   1        else 
+  54   1            return FALSE;
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 2   
+
+  55   1        
+  56   1      }
+  57          //========================================================================
+  58          // 函数: u8 xihuo(void)
+  59          // 描述: 获取车辆熄火状态,关联启动信号，着车之前必须出现启动信号。
+  60          //       可使用开关量或则发动机转速评判熄火     
+  61          // 参数：pFlash
+  62          // 返回: 车辆着车返回TURE，车辆熄火返回FLASE
+  63          // 版本: V1.0, 2022-10-17
+  64          //========================================================================
+  65          static u8 xihuo(void)  //熄火 D3
+  66          {
+  67   1        static u8 qidong_flag = FALSE;
+  68   1        static u8 zhaoche_flag = FALSE;
+  69   1        static u8 status = FALSE;
+  70   1        xdata u8 qd_pin   = BSP_ReadInputDataBit(&pFlash->qd);//读取输入状态
+  71   1        xdata u8 xh_pin   = BSP_ReadInputDataBit(&pFlash->xh);//读取输入状态
+  72   1        xdata u8 xh_type  = pFlash->xh.type;
+  73   1        
+  74   1        if(qd_pin == TURE)
+  75   1            qidong_flag = TURE;//出现启动信号
+  76   1      
+  77   1          switch(xh_type) 
+  78   1          {
+  79   2            case SWITCHING_AND_START://开关量评判模式(关联启动信号)
+  80   2                            if((xh_pin == TURE) && (qidong_flag == TURE)) 
+  81   2                            {
+  82   3                              qidong_flag = FALSE;//清空启动信号标志为
+  83   3                              zhaoche_flag = TURE;//车辆已经着车了
+  84   3                              return TURE;        //
+  85   3                            }
+  86   2                            else if((xh_pin == TURE) && (zhaoche_flag == TURE))
+  87   2                            { 
+  88   3                              return TURE;
+  89   3                            }
+  90   2                            else 
+  91   2                            {
+  92   3                              zhaoche_flag = FALSE;
+  93   3                              return FALSE;
+  94   3                            }
+  95   2                            break;
+  96   2            case SPEED_AND_START://转速评判模式(关联启动信号)
+  97   2                          if((T0_count > (u16)(pFlash->zs.min)) && (qidong_flag == TURE)) 
+  98   2                          {
+  99   3                            qidong_flag = FALSE;//清空启动信号标志为
+ 100   3                            zhaoche_flag = TURE;//车辆已经着车了
+ 101   3                            return TURE;        //
+ 102   3                          }
+ 103   2                          else if((T0_count > (u16)(pFlash->zs.min)) && (zhaoche_flag == TURE))
+ 104   2                          { 
+ 105   3                            return TURE;
+ 106   3                          }
+ 107   2                          else 
+ 108   2                          {
+ 109   3                            zhaoche_flag = FALSE;
+ 110   3                            return FALSE;
+ 111   3                          }
+ 112   2                          break;
+ 113   2            case SWITCHING_AND_SPEED:       //开关量和转速评判
+ 114   2                          if((xh_pin == TURE) && (T0_count > (u16)(pFlash->zs.min)))
+ 115   2                            return TURE;
+ 116   2                          else 
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 3   
+
+ 117   2                            return FALSE;
+ 118   2                            break;
+ 119   2            case SWITCHING_OR_SPEED:        //开关量或转速评判
+ 120   2                          if((xh_pin == TURE) || (T0_count > (u16)(pFlash->zs.min)))
+ 121   2                            return TURE;
+ 122   2                          else 
+ 123   2                            return FALSE;
+ 124   2                            break;
+ 125   2            case SWITCHING:                 //单开关量评判
+ 126   2                            return xh_pin;
+ 127   2                            break;
+ 128   2            case SPEED:                     //单转速转速评判
+ 129   2                            if(T0_count >= (u16)(pFlash->zs.min))
+ 130   2                            {
+ 131   3                              status = TURE;
+ 132   3                            }
+ 133   2                            else if(T0_count <= (u16)(pFlash->zs.max))
+ 134   2                            {
+ 135   3                              status = FALSE;
+ 136   3                            }
+ 137   2                            return status;
+ 138   2                            
+ 139   2                            break;
+ 140   2                            
+ 141   2            case 6:          //启动开关松开后采集车辆状态
+ 142   2                          if(T0_count > (u16)(pFlash->zs.min)) 
+ 143   2                          {
+ 144   3                            
+ 145   3                              if(qidong_flag == TURE) //按着马达了
+ 146   3                              {
+ 147   4                                  
+ 148   4                                    
+ 149   4                                    if(qd_pin == FALSE) //松开马达
+ 150   4                                    {                               
+ 151   5                                        qidong_flag = FALSE;
+ 152   5                                        zhaoche_flag = TURE;
+ 153   5                                        return TURE;                                
+ 154   5                                    }
+ 155   4                                    else
+ 156   4                                    {
+ 157   5                                      return FALSE;
+ 158   5                                    }
+ 159   4                               }
+ 160   3                               else if(zhaoche_flag == TURE) 
+ 161   3                               {
+ 162   4                                   return TURE;
+ 163   4                               }
+ 164   3                              else 
+ 165   3                               {
+ 166   4                                   return FALSE;;
+ 167   4                                
+ 168   4                               }    
+ 169   3                         }
+ 170   2                         else 
+ 171   2                          {
+ 172   3                              zhaoche_flag = FALSE;
+ 173   3                              return FALSE;
+ 174   3                            
+ 175   3                          }
+ 176   2                          //break;
+ 177   2            default:
+ 178   2                            return FALSE; 
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 4   
+
+ 179   2          }
+ 180   1      }
+ 181          //========================================================================
+ 182          // 函数: u8 shousha(void)
+ 183          // 描述: 获取手刹信号
+ 184          // 参数：pFlash，
+ 185          // 返回: 拉手刹返回TURE，松手刹返回FLASE
+ 186          // 版本: V1.0, 2022-10-17
+ 187          //========================================================================
+ 188          static u8 shousha(void)  //手刹D4
+ 189          {
+ 190   1        
+ 191   1        u8 ss_pin = BSP_ReadInputDataBit(&pFlash->ss);//读取输入状态
+ 192   1        
+ 193   1        return ss_pin;  
+ 194   1        
+ 195   1      }
+ 196          //========================================================================
+ 197          // 函数: u8 anquandai(FlashParameterTypeDef *pFlash)
+ 198          // 描述: 获取安全带信号
+ 199          // 参数：pFlash，
+ 200          // 返回: 系上安全带返回TURE，松开安全带返回FLASE
+ 201          // 版本: V1.0, 2022-10-17
+ 202          //========================================================================
+ 203          static u8 anquandai(void)  //安全带D5
+ 204          {
+ 205   1        
+ 206   1        u8 aqd_pin = BSP_ReadInputDataBit(&pFlash->aqd);//读取输入状态
+ 207   1        #ifdef DEBUG1
+                      printf("aqd_pin = %b02d\r\n",aqd_pin);
+                #endif  
+ 210   1        
+ 211   1        return aqd_pin; 
+ 212   1        
+ 213   1      }
+ 214          //========================================================================
+ 215          // 函数: u8 chenmen_zq(void)
+ 216          // 描述: 获取车门信号,左前、右前、左后、右后共四个门，
+ 217          // 参数：pFlash，
+ 218          // 返回: 打开车门返回FLASE，关闭车门返回0xF0,车门为高四位
+ 219          // 版本: V1.0, 2022-10-17
+ 220          //========================================================================
+ 221          static u8 chemen(void)      //车门D6
+ 222          {
+ 223   1        
+ 224   1        u8 cm_pin = BSP_ReadInputDataBit(&pFlash->cm);//读取输入状态
+ 225   1        
+ 226   1        if(cm_pin == TURE)
+ 227   1          return 0xF0;  //车门为高四位
+ 228   1        else 
+ 229   1          return FALSE;
+ 230   1        
+ 231   1      }
+ 232          //========================================================================
+ 233          // 函数: u8 daochedeng(void)
+ 234          // 描述: 获取倒车灯信号
+ 235          // 参数：pFlash，
+ 236          // 返回: 挂倒挡返回TURE，不在倒挡返回FLASE
+ 237          // 版本: V1.0, 2022-10-17
+ 238          //========================================================================
+ 239          static u8 daochedeng(void)  //倒车灯 D7
+ 240          {
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 5   
+
+ 241   1        
+ 242   1        u8 dcd_pin = BSP_ReadInputDataBit(&pFlash->dcd);//读取输入状态
+ 243   1        
+ 244   1        return dcd_pin; 
+ 245   1        
+ 246   1      }
+ 247          //========================================================================
+ 248          // 函数: u8 laba(void)
+ 249          // 描述: 获取喇叭信号
+ 250          // 参数：pFlash，
+ 251          // 返回: 按喇叭返回TURE，松开喇叭返回FLASE
+ 252          // 版本: V1.0, 2022-10-17
+ 253          //========================================================================
+ 254          static u8 laba(void)  //喇叭  D8
+ 255          {
+ 256   1        
+ 257   1        u8 lb_pin = BSP_ReadInputDataBit(&pFlash->lb);//读取输入状态
+ 258   1        
+ 259   1        return lb_pin;  
+ 260   1        
+ 261   1      }
+ 262          //========================================================================
+ 263          // 函数: u8 raoche1(void)
+ 264          // 描述: 获取绕车开关1信号
+ 265          // 参数：pFlash，
+ 266          // 返回: 按开关返回PRESS，松开开关返回NOPRESS
+ 267          // 版本: V1.0, 2022-10-17
+ 268          //========================================================================
+ 269          static u8 raoche1(void)  //绕车1   D9
+ 270          {
+ 271   1      
+ 272   1        u8 rc_pin1 = BSP_ReadMultipleDataBit(&pFlash->rc,RCPIN1);//读取输入状态
+ 273   1        
+ 274   1        (rc_pin1 == TURE)? (rc_pin1 = PRESS):(rc_pin1 = NOPRESS);//按照协议赋值
+ 275   1        
+ 276   1        return rc_pin1; 
+ 277   1        
+ 278   1      }
+ 279          //========================================================================
+ 280          // 函数: u8 raoche1(FlashParameterTypeDef *pFlash)
+ 281          // 描述: 获取绕车开关2信号
+ 282          // 参数：pFlash，
+ 283          // 返回: 按开关返回PRESS，松开开关返回NOPRESS
+ 284          // 版本: V1.0, 2022-10-17
+ 285          //========================================================================
+ 286          static u8 raoche2(void)  //绕车2   D10
+ 287          {
+ 288   1        
+ 289   1        u8 rc_pin2 = BSP_ReadMultipleDataBit(&pFlash->rc,RCPIN2);//读取输入状态
+ 290   1        
+ 291   1        (rc_pin2 == TURE)? (rc_pin2 = PRESS):(rc_pin2 = NOPRESS);//按照协议赋值
+ 292   1        
+ 293   1        return rc_pin2; 
+ 294   1        
+ 295   1      }
+ 296          //========================================================================
+ 297          // 函数: u8 wudeng(void)
+ 298          // 描述: 获取雾灯开关2信号
+ 299          // 参数：pFlash，
+ 300          // 返回: 开雾灯返回TURE，关闭雾灯返回FLASE
+ 301          // 版本: V1.0, 2022-10-17
+ 302          //========================================================================
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 6   
+
+ 303          static u8 wudeng(void)  //雾灯 D11
+ 304          {
+ 305   1        
+ 306   1        u8 wd_pin = BSP_ReadInputDataBit(&pFlash->wd);//读取输入状态
+ 307   1        
+ 308   1        return wd_pin;  
+ 309   1        
+ 310   1      }
+ 311          //========================================================================
+ 312          // 函数: u8 yuanguang(void)
+ 313          // 描述: 获取远光开关信号
+ 314          // 参数：pFlash，
+ 315          // 返回: 开远光灯返回TURE，关闭远光灯返回FLASE
+ 316          // 版本: V1.0, 2022-10-17
+ 317          //========================================================================
+ 318          static u8 yuanguang(void)  //远光 D12
+ 319          {
+ 320   1        
+ 321   1        u8 yg_pin = BSP_ReadInputDataBit(&pFlash->yg);//读取输入状态
+ 322   1        
+ 323   1        return yg_pin;  
+ 324   1        
+ 325   1      }
+ 326          //========================================================================
+ 327          // 函数: u8 jinguang(void)
+ 328          // 描述: 获取近光开关信号
+ 329          // 参数：pFlash，
+ 330          // 返回: 开近光灯返回TURE，关闭近光灯返回FLASE
+ 331          // 版本: V1.0, 2022-10-17
+ 332          //========================================================================
+ 333          static u8 jinguang(void)  //近光 D13
+ 334          {
+ 335   1        
+ 336   1        u8 jg_pin = BSP_ReadInputDataBit(&pFlash->jg);//读取输入状态
+ 337   1        
+ 338   1        return jg_pin;  
+ 339   1        
+ 340   1      }
+ 341          //========================================================================
+ 342          // 函数: u8 xiaodeng(void)
+ 343          // 描述: 获取小灯开关信号
+ 344          // 参数：pFlash，
+ 345          // 返回: 开小灯返回TURE，关闭小灯返回FLASE
+ 346          // 版本: V1.0, 2022-10-17
+ 347          //========================================================================
+ 348          static u8 xiaodeng(void)  //小灯 D14
+ 349          {
+ 350   1        
+ 351   1        u8 xd_pin = BSP_ReadInputDataBit(&pFlash->xd);//读取输入状态
+ 352   1        
+ 353   1        return xd_pin;  
+ 354   1        
+ 355   1      }
+ 356          //========================================================================
+ 357          // 函数: u8 jiaosha(void)
+ 358          // 描述: 获取脚刹信号
+ 359          // 参数：pFlash，
+ 360          // 返回: 踩脚刹返回TURE，松开脚刹返回FLASE
+ 361          // 版本: V1.0, 2022-10-17
+ 362          //========================================================================
+ 363          static u8 jiaosha(void)  //脚刹 D15
+ 364          {
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 7   
+
+ 365   1        
+ 366   1        u8 js_pin = BSP_ReadInputDataBit(&pFlash->js);//读取输入状态
+ 367   1        
+ 368   1        return js_pin;  
+ 369   1        
+ 370   1      }
+ 371          //========================================================================
+ 372          // 函数: u8 yushua(void)
+ 373          // 描述: 获取雨刷器信号
+ 374          // 参数：pFlash，
+ 375          // 返回: 开雨刷器返回TURE，关闭雨刷器返回FLASE
+ 376          // 版本: V1.0, 2022-10-17
+ 377          //========================================================================
+ 378          static u8 yushua(void)  //雨刷 D16
+ 379          {
+ 380   1        
+ 381   1        u8 ys_pin = BSP_ReadInputDataBit(&pFlash->ys);//读取输入状态
+ 382   1        
+ 383   1        return ys_pin;  
+ 384   1        
+ 385   1      }
+ 386          //========================================================================
+ 387          // 函数: u8 zuohoushi(void)
+ 388          // 描述: 获取调节左后视镜信号
+ 389          // 参数：pFlash，
+ 390          // 返回: 调节左后视镜返回TURE，未调节返回FLASE
+ 391          // 版本: V1.0, 2022-10-17
+ 392          //========================================================================
+ 393          static u8 zuohoushi(void)  //左后视 D17
+ 394          {
+ 395   1        
+ 396   1        u8 zhs_pin = BSP_ReadInputDataBit(&pFlash->zhs);//读取输入状态
+ 397   1        
+ 398   1        return zhs_pin; 
+ 399   1        
+ 400   1      }
+ 401          //========================================================================
+ 402          // 函数: u8 qidong(void)
+ 403          // 描述: 获取启动开关信号
+ 404          // 参数：pFlash，
+ 405          // 返回: 启动点火时返回TURE，松开启动钥匙返回FLASE
+ 406          // 版本: V1.0, 2022-10-17
+ 407          //========================================================================
+ 408          static u8 qidong(void)  //启动开关 D18
+ 409          {
+ 410   1        static u8 mlqd_flag = 0;//模拟启动标志
+ 411   1        xdata u8 xh_pin   = BSP_ReadInputDataBit(&pFlash->xh);//读取输入状态
+ 412   1        xdata u8 qd_pin = BSP_ReadInputDataBit(&pFlash->qd);//读取输入状态
+ 413   1        xdata u8 ysm_pin  = BSP_ReadInputDataBit(&pFlash->ysm);//读取输入状态
+ 414   1        xdata u8 qd_type  = pFlash->qd.type;//读取启动类型
+ 415   1        
+ 416   1        switch(qd_type) 
+ 417   1          {
+ 418   2            case 0: //要是启动有启动信号
+ 419   2                    break;
+ 420   2            
+ 421   2            case 1: //一键启动车辆，模拟启动信号
+ 422   2                    if((xh_pin == TURE) && (mlqd_flag == 0)) 
+ 423   2                    {
+ 424   3                      mlqd_flag = 1;//模拟启动信号置位
+ 425   3                      pFlash->qd.times = 0;//启动信号模拟置位
+ 426   3                    }
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 8   
+
+ 427   2                    else if(xh_pin == FALSE)//熄火后复位
+ 428   2                    {
+ 429   3                      mlqd_flag = 0;//模拟启动信号复位
+ 430   3                    }
+ 431   2                    break;  
+ 432   2                    
+ 433   2            case 2: //启动 & 钥匙门
+ 434   2                    if((qd_pin == TURE) && (ysm_pin == TURE)) 
+ 435   2                        return TURE;        
+ 436   2                      else 
+ 437   2                        return FALSE;
+ 438   2            default:
+ 439   2                return FALSE;
+ 440   2                    break;
+ 441   2              
+ 442   2          }
+ 443   1          
+ 444   1        
+ 445   1        return qd_pin;  
+ 446   1        
+ 447   1      }
+ 448          //========================================================================
+ 449          // 函数: u8 neihoushi(void)
+ 450          // 描述: 获取调节内后视镜信号
+ 451          // 参数：pFlash，
+ 452          // 返回: 调节内后视镜返回TURE，未调节返回FLASE
+ 453          // 版本: V1.0, 2022-10-17
+ 454          //========================================================================
+ 455          static u8 neihoushi(void)  //内后视 D19
+ 456          {
+ 457   1        
+ 458   1        xdata u8 nhs_pin = BSP_ReadInputDataBit(&pFlash->nhs);//读取输入状态
+ 459   1        
+ 460   1        return nhs_pin; 
+ 461   1        
+ 462   1      }
+ 463          //========================================================================
+ 464          // 函数: u8 zuoyitiaojie(void)
+ 465          // 描述: 获取调节座椅信号
+ 466          // 参数：pFlash，
+ 467          // 返回: 调节座椅返回TURE，未调节返回FLASE
+ 468          // 版本: V1.0, 2022-10-17
+ 469          //========================================================================
+ 470          static u8 zuoyitiaojie(void)  //座椅调节开关 D20
+ 471          {
+ 472   1        
+ 473   1        u8 zytj_pin = BSP_ReadInputDataBit(&pFlash->zytj);//读取输入状态
+ 474   1        
+ 475   1        return zytj_pin;  
+ 476   1        
+ 477   1      }
+ 478          //========================================================================
+ 479          // 函数: u8 dangwei(void)
+ 480          // 描述: 获取挡位信号，传感器类型有磁感和倾角两种类型。
+ 481          // 参数：pFlash，
+ 482          // 返回:  GEAR1    1档
+ 483          //        GEAR2    2档
+ 484          //        GEAR3    3档
+ 485          //        GEAR4    4档
+ 486          //        GEAR5    5档
+ 487          //        GEARR    R档
+ 488          // 版本: V1.0, 2022-10-17
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 9   
+
+ 489          //========================================================================
+ 490          static u8 dangwei(void)  //挡位D21--D24
+ 491          {
+ 492   1        u8 temp = 0;
+ 493   1        u8 dw_pin1 = BSP_ReadMultipleDataBit(&pFlash->dw,DWPIN1);//读取输入状态D21
+ 494   1        u8 dw_pin2 = BSP_ReadMultipleDataBit(&pFlash->dw,DWPIN2);//读取输入状态D22
+ 495   1        u8 dw_pin3 = BSP_ReadMultipleDataBit(&pFlash->dw,DWPIN3);//读取输入状态D23
+ 496   1        u8 dw_pin4 = BSP_ReadMultipleDataBit(&pFlash->dw,DWPIN4);//读取输入状态D24
+ 497   1        u8 dw_pin5 = BSP_ReadMultipleDataBit(&pFlash->dw,DWPIN5);//读取输入状态D32
+ 498   1        
+ 499   1        u8 dw_type = pFlash->dw.type;//获取传感器类型
+ 500   1        u8 qd_pin = BSP_ReadInputDataBit(&pFlash->qd);//读取输入状态
+ 501   1        u8 ysm_pin = BSP_ReadInputDataBit(&pFlash->ysm);//读取输入状态
+ 502   1        u8 dcd_pin = BSP_ReadInputDataBit(&pFlash->dcd);//读取倒车灯状态
+ 503   1        static u8 value=0;
+ 504   1        
+ 505   1        //如果倒车灯亮，不取挡位传感器的值，直接返回倒挡
+ 506   1        //点火时，倒挡灯会闪硕，出现启动发电机时发动机未至于空挡,需要关联启动信
+             -号
+ 507   1        if((dcd_pin == TURE) &&(qd_pin == FALSE)) 
+ 508   1        {
+ 509   2          return GEARR;
+ 510   2        }
+ 511   1      
+ 512   1        switch(dw_type)
+ 513   1        {
+ 514   2          case  MAGNETIC://磁传感器
+ 515   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 | dw_pin4<<3);
+ 516   2                          if(temp == 0x01) value = GEAR1;
+ 517   2                          else if(temp == 0x02) value = GEAR2;
+ 518   2                          else if(temp == 0x04) value = GEAR3;
+ 519   2                          else if(temp == 0x08) value = GEAR4;
+ 520   2                          else if(temp == 0x05) value = GEAR5;
+ 521   2                          else if(temp == 0x0F) value = GEARR;
+ 522   2                          else value = FALSE;
+ 523   2                          break;
+ 524   2          case  ANGLE://倾角感器
+ 525   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 );
+ 526   2                          if(temp == 0x06) value = GEAR1;
+ 527   2                          else if(temp ==  0x05) value = GEAR2;
+ 528   2                          else if(temp ==  0x04) value = GEAR3;
+ 529   2                          else if(temp ==  0x03) value = GEAR4;
+ 530   2                          else if(temp ==  0x02) value = GEAR5;
+ 531   2                          else if(temp ==  0x01) value = GEARR;
+ 532   2                          else value = FALSE;
+ 533   2                          break;
+ 534   2          case  3://张家口三轮车   
+ 535   2                          if(qd_pin == TURE)  
+ 536   2                            return  value;
+ 537   2                          temp = (dw_pin1<<0 | dw_pin2<<1 );
+ 538   2                          if(temp == 0x00) value = GEAR1;
+ 539   2                          else if(temp ==  0x03) value = GEAR2;
+ 540   2                          else value = FALSE;
+ 541   2                          if(ysm_pin == FALSE)  value = FALSE;
+ 542   2                          break;
+ 543   2          case  4://张家口二轮车
+ 544   2                          if(qd_pin == TURE)   return value;
+ 545   2                          temp = ((dw_pin1<<0) | (dw_pin2<<1) );
+ 546   2                          if(temp == 0x02) value = GEAR1;
+ 547   2                          else if(temp ==  0x01) value = GEAR2;
+ 548   2                          else value = FALSE;
+ 549   2                          if(ysm_pin == FALSE)  value = FALSE;
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 10  
+
+ 550   2                          break;
+ 551   2          case  5://贵州摩托车
+ 552   2                          temp = ( dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 );
+ 553   2                          dbugGearr = temp;//在软件的的“次数”位置显示采样到的挡位值
+ 554   2                          if(temp == 0x01) value = GEAR1;
+ 555   2                          else if(temp ==  0x02) value = GEAR2;
+ 556   2                          else if(temp ==  0x04) value = GEAR3;
+ 557   2                          else value = FALSE;
+ 558   2                          break;
+ 559   2          case  6://重庆摩托车
+ 560   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 | dw_pin4<<3);
+ 561   2                          if(temp == 0x07) value = GEAR1;
+ 562   2                          else if(temp == 0x02) value = GEAR2;
+ 563   2                          else if(temp == 0x04) value = GEAR3;
+ 564   2                          else if(temp == 0x08) value = GEAR4;
+ 565   2                          else value = FALSE;
+ 566   2                          break;
+ 567   2          case  8://自定义模式
+ 568   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 | dw_pin4<<3 | dw_pin5<<4);
+ 569   2                          dbugGearr = temp;//在软件的的“次数”位置显示采样到的挡位值
+ 570   2                          if(temp == pFlash->dw.value[0])  value = GEAR1;//1档
+ 571   2                          else if(temp == pFlash->dw.value[1])  value = GEAR2;//2档)
+ 572   2                          else if(temp == pFlash->dw.value[2])  value = GEAR3;//3档)
+ 573   2                          else if(temp == pFlash->dw.value[3])  value = GEAR4;//4档)
+ 574   2                          else if(temp == pFlash->dw.value[4])  value = GEAR5;//5档)
+ 575   2                          else if(temp == pFlash->dw.value[5])  value = GEARR;//R档)
+ 576   2                          else value = 0;//空挡
+ 577   2                          break;
+ 578   2          case  9://自定义模式//空挡指定标定值
+ 579   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 | dw_pin4<<3 | dw_pin5<<4);
+ 580   2                          dbugGearr = temp;//在软件的的“次数”位置显示采样到的挡位值
+ 581   2                          if(temp == pFlash->dw.value[0])  value = GEAR1;//1档
+ 582   2                          else if(temp == pFlash->dw.value[1])  value = GEAR2;//2档)
+ 583   2                          else if(temp == pFlash->dw.value[2])  value = GEAR3;//3档)
+ 584   2                          else if(temp == pFlash->dw.value[3])  value = GEAR4;//4档)
+ 585   2                          else if(temp == pFlash->dw.value[4])  value = GEAR5;//5档)
+ 586   2                          else if(temp == pFlash->dw.value[5])  value = GEARR;//R档)
+ 587   2                          else if(temp == pFlash->dw.value[6])  value = 0;//空档)
+ 588   2                          break;
+ 589   2      //   case 10://装甲，麦杰转接板模式
+ 590   2      //                    temp = MaijieAdapterBoard.gear;
+ 591   2      //                    if(temp == 1)  value = GEAR1;//1档
+ 592   2      //                    else if(temp == 2)  value = GEAR2;//2档)
+ 593   2      //                    else if(temp == 3)  value = GEAR3;//3档)
+ 594   2      //                    else if(temp == 4)  value = GEAR4;//4档)
+ 595   2      //                    else if(temp == 5)  value = GEAR5;//5档)
+ 596   2      //                    else if(temp == 6)  value = GEARR;//R档)
+ 597   2      //                    else if(temp == 0)  value = 0;//空档)
+ 598   2          case  255://调试模式
+ 599   2                          temp = (dw_pin1<<0 | dw_pin2<<1 | dw_pin3<<2 | dw_pin4<<3 | dw_pin5<<4);
+ 600   2                          dbugGearr = temp;//在软件的的“次数”位置显示采样到的挡位值
+ 601   2                          if(temp == pFlash->dw.value[0])  value = GEAR1;//1档
+ 602   2                          else if(temp == pFlash->dw.value[1])  value = GEAR2;//2档)
+ 603   2                          else if(temp == pFlash->dw.value[2])  value = GEAR3;//3档)
+ 604   2                          else if(temp == pFlash->dw.value[3])  value = GEAR4;//4档)
+ 605   2                          else if(temp == pFlash->dw.value[4])  value = GEAR5;//5档)
+ 606   2                          else if(temp == pFlash->dw.value[5])  value = GEARR;//R档)
+ 607   2                          else value = 0;//空挡
+ 608   2                          break;
+ 609   2          default:
+ 610   2      
+ 611   2                      value = FALSE;
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 11  
+
+ 612   2                      break;
+ 613   2            
+ 614   2        }
+ 615   1        
+ 616   1        return value;
+ 617   1      
+ 618   1        
+ 619   1      }
+ 620          //========================================================================
+ 621          // 函数: u8 zuoyiyali(void)
+ 622          // 描述: 获取座椅（压力）信号
+ 623          // 参数：pFlash，
+ 624          // 返回: 座椅有压力返回TURE，没有压力返回FLASE
+ 625          // 版本: V1.0, 2022-10-17
+ 626          //========================================================================
+ 627          static u8 zuoyiyali(void)  ///座椅（压力） D25
+ 628          {
+ 629   1        
+ 630   1        xdata u8 zyyl_pin = BSP_ReadInputDataBit(&pFlash->zyyl);//读取输入状态
+ 631   1        
+ 632   1        return zyyl_pin;  
+ 633   1        
+ 634   1      }
+ 635          //========================================================================
+ 636          // 函数: u8 lihe(FlashParameterTypeDef *pFlash)
+ 637          // 描述: 获取离合器信号
+ 638          // 参数：pFlash，
+ 639          // 返回: 踩下离合器返回TURE，抬起离合器返回FLASE
+ 640          // 版本: V1.0, 2022-10-17
+ 641          //========================================================================
+ 642          static u8 lihe(void)   //离合 D26
+ 643          {
+ 644   1        
+ 645   1        u8 lh_pin = BSP_ReadInputDataBit(&pFlash->lh);//读取输入状态
+ 646   1        
+ 647   1        return lh_pin;  
+ 648   1        
+ 649   1      }
+ 650          //========================================================================
+ 651          // 函数: u8 yaoshimen(void)
+ 652          // 描述: 获取钥匙门信号
+ 653          // 参数：pFlash，
+ 654          // 返回: 打开钥匙门开关返回TURE，关闭钥匙门开关返回FLASE
+ 655          // 版本: V1.0, 2022-10-17
+ 656          //========================================================================
+ 657          static u8 yaoshimen(void)   //钥匙门开关 D28
+ 658          {
+ 659   1        
+ 660   1        u8 ysm_pin = BSP_ReadInputDataBit(&pFlash->ysm);//读取输入状态
+ 661   1        
+ 662   1        return ysm_pin; 
+ 663   1        
+ 664   1      }
+ 665          //========================================================================
+ 666          // 函数: u8 fushache(void)
+ 667          // 描述: 获取副刹信号
+ 668          // 参数：pFlash，
+ 669          // 返回: 踩下副刹车返回TURE，抬起副刹车返回FLASE
+ 670          // 版本: V1.0, 2022-10-17
+ 671          //========================================================================
+ 672          static u8 fushache(void)   //副刹车 D29
+ 673          {
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 12  
+
+ 674   1        
+ 675   1        u8 fsc_pin = BSP_ReadInputDataBit(&pFlash->fsc);//读取输入状态
+ 676   1        
+ 677   1        return fsc_pin; 
+ 678   1        
+ 679   1      }
+ 680          //========================================================================
+ 681          // 函数: u8 chuangdong(void)
+ 682          // 描述: 获取起步时闯动信号
+ 683          // 参数：pFlash，
+ 684          // 返回: 出线闯动返回TURE，平稳返回FLASE
+ 685          // 版本: V1.0, 2022-10-17
+ 686          //========================================================================
+ 687          static u8 chuangdong(void)   //闯动传感器 D30
+ 688          {
+ 689   1        
+ 690   1        u8 cd_pin = BSP_ReadInputDataBit(&pFlash->cd);//读取输入状态
+ 691   1        
+ 692   1        return cd_pin;  
+ 693   1        
+ 694   1      }
+ 695          //========================================================================
+ 696          // 函数: u8 raoche3(void)
+ 697          // 描述: 获取绕车3信号
+ 698          // 参数：pFlash，
+ 699          // 返回: 按下返回TURE，未按下FLASE
+ 700          // 版本: V1.0, 2022-10-17
+ 701          //========================================================================
+ 702          static u8 raoche3(void)   //绕车3  D31
+ 703          {
+ 704   1        
+ 705   1        u8 rc_pin3 = BSP_ReadMultipleDataBit(&pFlash->rc,RCPIN3);//读取输入状态
+ 706   1        
+ 707   1        (rc_pin3 == TURE)? (rc_pin3 = PRESS):(rc_pin3 = NOPRESS);//按照协议赋值
+ 708   1        
+ 709   1        return rc_pin3; 
+ 710   1        
+ 711   1      }
+ 712          //========================================================================
+ 713          // 函数: u8 shijing(void)
+ 714          // 描述: 获取双闪信号
+ 715          // 参数：pFlash，
+ 716          // 返回: 打开双闪返回TURE，关闭双闪返回FLASE
+ 717          // 版本: V1.1, 2024-11-27
+ 718          //========================================================================
+ 719          static u8 shijing(void)   //示警开关
+ 720          {
+ 721   1        
+ 722   1        u8 zz_pin = BSP_ReadInputDataBit(&pFlash->zz);//读取输入状态
+ 723   1        u8 yz_pin = BSP_ReadInputDataBit(&pFlash->yz);//读取输入状态
+ 724   1        u8 sj_pin = BSP_ReadInputDataBit(&pFlash->sj);//读取输入状态
+ 725   1        
+ 726   1        
+ 727   1        u8 zz_pin_gpio = BSP_GetGpioStatus(pFlash->zz.pin);//获取单片机的管脚输入状态
+ 728   1        u8 yz_pin_gpio = BSP_GetGpioStatus(pFlash->yz.pin);//获取单片机的管脚输入状态
+ 729   1        
+ 730   1        
+ 731   1        u8 sj_type =pFlash->sj.type;//获取信号接入类型
+ 732   1        
+ 733   1        static u8  openFlag = 0;
+ 734   1        
+ 735   1      
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 13  
+
+ 736   1        if(sj_type == 1) //取示警开关的信号
+ 737   1        {
+ 738   2          return sj_pin;
+ 739   2        }
+ 740   1        else //取左右转向灯的信号
+ 741   1        {
+ 742   2          if(zz_pin_gpio == TURE && yz_pin_gpio == TURE && openFlag == 0)
+ 743   2           {
+ 744   3              openFlag = 1;
+ 745   3              return FALSE;
+ 746   3           }
+ 747   2           if((zz_pin == TURE) && (yz_pin == TURE)  && (openFlag == 1))
+ 748   2           {
+ 749   3              return TURE;
+ 750   3           }
+ 751   2           openFlag = 0;
+ 752   2           return FALSE;
+ 753   2        }
+ 754   1        
+ 755   1      }
+ 756          //========================================================================
+ 757          // 函数: u8 kongdang(void)
+ 758          // 描述: 获取空挡信号
+ 759          // 参数：pFlash，
+ 760          // 返回: 空挡返回TURE，非空挡返回FLASE
+ 761          // 版本: V1.0, 2022-10-17
+ 762          //========================================================================
+ 763          static u8 kongdang(void)   //空挡
+ 764          {
+ 765   1        
+ 766   1        if(dangwei() != FALSE)
+ 767   1            return TURE;
+ 768   1        else 
+ 769   1            return FALSE;
+ 770   1        
+ 771   1      }
+ 772          //========================================================================
+ 773          // 函数: u8 guanchayibiao(void)
+ 774          // 描述: 获取观察仪表盘信号
+ 775          // 参数：pFlash，
+ 776          // 返回: 观察返回TURE，没有观察返回FLASE
+ 777          // 版本: V1.0, 2022-10-17
+ 778          //========================================================================
+ 779          static u8 guanchayibiao(void)   //观察仪表盘
+ 780          {
+ 781   1        
+ 782   1        u8 gcybp_pin = BSP_ReadInputDataBit(&pFlash->gcybp);//读取输入状态
+ 783   1        
+ 784   1        return gcybp_pin; 
+ 785   1        
+ 786   1      }
+ 787          //========================================================================
+ 788          // 函数: u8 begin(void)
+ 789          // 描述: 触发开始考试信号线
+ 790          // 参数：pFlash，
+ 791          // 返回: 刹住住返回TURE，离开返回FLASE
+ 792          // 版本: V1.0, 2024-7-31
+ 793          //========================================================================
+ 794          static u8 begin(void)    //触发开始考试信号
+ 795          {
+ 796   1        u8 begin_pin = BSP_ReadInputDataBit(&pFlash->begin);//读取输入状态
+ 797   1        
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 14  
+
+ 798   1        return begin_pin;
+ 799   1      
+ 800   1      }
+ 801          
+ 802          //========================================================================
+ 803          // 函数: u8 DBQ_LeftFront(void)
+ 804          // 描述: 获取单边桥传感器左前轮信号
+ 805          // 参数：pFlash，
+ 806          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 807          // 版本: V1.0, 2022-10-17
+ 808          //========================================================================
+ 809          static u8 DBQ_LeftFront(void)    //单边桥左前轮状态
+ 810          {
+ 811   1        u8 dbq_pin1 = BSP_ReadMultipleDataBit(&pFlash->dbq,LEFT_FRONT_WHEEL);//读取输入状态
+ 812   1        
+ 813   1        return dbq_pin1;
+ 814   1      
+ 815   1      }
+ 816          //========================================================================
+ 817          // 函数: u8 DBQ_LeftRear(void)
+ 818          // 描述: 获取单边桥传感器左后轮信号
+ 819          // 参数：pFlash，
+ 820          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 821          // 版本: V1.0, 2022-10-17
+ 822          //========================================================================
+ 823          static u8 DBQ_LeftRear(void)    //单边桥左后轮状态
+ 824          {
+ 825   1        u8 dbq_pin2 = BSP_ReadMultipleDataBit(&pFlash->dbq,LEFT_REAR_WHEEL);//读取输入状态
+ 826   1        
+ 827   1        return dbq_pin2;
+ 828   1      
+ 829   1      }
+ 830          //========================================================================
+ 831          // 函数: u8 DBQ_LeftRear(void)
+ 832          // 描述: 获取单边桥传感器右前轮信号
+ 833          // 参数：pFlash，
+ 834          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 835          // 版本: V1.0, 2022-10-17
+ 836          //========================================================================
+ 837          static u8 DBQ_RightFront(void)    //单边桥右前轮状态
+ 838          {
+ 839   1        u8 dbq_pin3 = BSP_ReadMultipleDataBit(&pFlash->dbq,RIGHT_FRONT_WHEEL);//读取输入状态
+ 840   1        
+ 841   1        return dbq_pin3;
+ 842   1      
+ 843   1      }
+ 844          //========================================================================
+ 845          // 函数: u8 DBQ_RightRear(void)
+ 846          // 描述: 获取单边桥传感器右后轮信号
+ 847          // 参数：pFlash，
+ 848          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 849          // 版本: V1.0, 2022-10-17
+ 850          //========================================================================
+ 851          static u8 DBQ_RightRear(void)    //单边桥右后轮状态
+ 852          {
+ 853   1        u8 dbq_pin4 = BSP_ReadMultipleDataBit(&pFlash->dbq,RIGHT_REAR_WHEEL);//读取输入状态
+ 854   1        
+ 855   1        return dbq_pin4;
+ 856   1      
+ 857   1      }
+ 858          //========================================================================
+ 859          // 函数: u8 DBQ_LeftMiddle(void)
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 15  
+
+ 860          // 描述: 获取单边桥传感器左挂车轮信号
+ 861          // 参数：pFlash，
+ 862          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 863          // 版本: V1.0, 2022-10-17
+ 864          //========================================================================
+ 865          static u8 DBQ_LeftMiddle(void)    //单边桥左挂车轮状态
+ 866          {
+ 867   1        u8 dbq_pin5 = BSP_ReadMultipleDataBit(&pFlash->dbq,LEFT_MIDDLE_WHEEL);//读取输入状态
+ 868   1        
+ 869   1        return dbq_pin5;
+ 870   1      
+ 871   1      }
+ 872          //========================================================================
+ 873          // 函数: u8 DBQ_RightMiddle(void)
+ 874          // 描述: 获取单边桥传感器右挂车轮信号
+ 875          // 参数：pFlash，
+ 876          // 返回: 在桥上返回TURE，不桥上返回FLASE
+ 877          // 版本: V1.0, 2022-10-17
+ 878          //========================================================================
+ 879          static u8 DBQ_RightMiddle(void)    //单边桥右挂车轮状态
+ 880          {
+ 881   1        u8 dbq_pin6 = BSP_ReadMultipleDataBit(&pFlash->dbq,RIGHT_MIDDLE_WHEEL);//读取输入状态
+ 882   1        
+ 883   1        return dbq_pin6;
+ 884   1      
+ 885   1      }
+ 886          //========================================================================
+ 887          // 函数: u8 zhuansucount(void)
+ 888          // 描述: 获取转速的脉冲计数值
+ 889          // 参数：pFlash，
+ 890          // 返回: 
+ 891          // 版本: V1.0, 2022-10-17
+ 892          //========================================================================
+ 893          static u16 zhuansucount(void)    //脉冲计数
+ 894          {
+ 895   1        static u8 times = 0;//采样等待次数（时间）
+ 896   1        static u16 count = 0;//获取转速计数器的值
+ 897   1        if(pFlash->zs.sampling_time == 0) return 0;//关闭转速采样
+ 898   1        if(times == pFlash->zs.sampling_time)//到达采样时间
+ 899   1        {
+ 900   2          times = 0;
+ 901   2          count = TH0;
+ 902   2          count = count<<8; 
+ 903   2          count = count + TL0;
+ 904   2          T0_count  = count;//用于转速熄火评判
+ 905   2          if(pFlash->zs.bs == 0)
+ 906   2          {
+ 907   3          count = count* (pFlash->zs.bs + 1);
+ 908   3          }
+ 909   2          else
+ 910   2          {
+ 911   3            count = count* pFlash->zs.bs;
+ 912   3          }     
+ 913   2          if(count>=5000) count=800;//转速出现异常    
+ 914   2          TH0 = 0;//清零
+ 915   2          TL0 = 0;//清零  
+ 916   2          if ((count == 0) && (pFlash->zs.init_value >0) && (xihuo() == TURE))
+ 917   2          {
+ 918   3            count = ((pFlash->zs.init_value) *10);  //贵州特殊要求
+ 919   3          }
+ 920   2        }
+ 921   1        else
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 16  
+
+ 922   1        {
+ 923   2          times++;
+ 924   2        }
+ 925   1        return count;
+ 926   1      
+ 927   1      }
+ 928          //========================================================================
+ 929          // 函数: u8 lichengcount(void)
+ 930          // 描述: 获取里程的脉冲计数值
+ 931          // 参数：pFlash，
+ 932          // 返回: 
+ 933          // 版本: V1.0, 2022-10-17
+ 934          //========================================================================
+ 935          static u16 lichengcount(void)    //脉冲计数
+ 936          {
+ 937   1        u16 count = 0;//里程初值
+ 938   1        u8 LC_TH =0;
+ 939   1        u8 LC_TL =0;
+ 940   1        switch(pFlash->lc.pin)
+ 941   1        {
+ 942   2          case  LC_T0: 
+ 943   2                       LC_TH = TH0;//使用计数器TO
+ 944   2                       LC_TL = TL0;
+ 945   2                       break;
+ 946   2          case  LC_T1:             //使用计数器T1
+ 947   2                       LC_TH = TH1;
+ 948   2                       LC_TL = TL1;
+ 949   2                       break;
+ 950   2      #ifdef  STC15W4K48S4
+              
+                  case  LC_T2:             //使用计数器T2
+                               LC_TH = T2H;
+                               LC_TL = T2L;
+                               break;
+                  
+              
+                  case  LC_T3:             //使用计数器T3
+                               LC_TH = T3H;
+                               LC_TL = T3L;
+                               break;
+                  
+                  case  LC_T4:             //使用计数器T4
+                               LC_TH = T4H;
+                               LC_TL = T4L;
+                               break;
+              #endif
+ 968   2      
+ 969   2          default:
+ 970   2            
+ 971   2                return  0;        
+ 972   2        }
+ 973   1        count = LC_TH;
+ 974   1        count = count<<8; 
+ 975   1        count = count + LC_TL;
+ 976   1        if(pFlash->lc.falling_ed) //查看跳变优化是否配置  
+ 977   1        {
+ 978   2          if(count >= licheng) //没有发生65536翻转
+ 979   2          {
+ 980   3             if((count - licheng) <= pFlash->lc.falling_ed) //未发生跳变
+ 981   3             {
+ 982   4                return count;
+ 983   4             }
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 17  
+
+ 984   3          }
+ 985   2          else  //发生65536翻转
+ 986   2          {
+ 987   3              if((65536  - licheng + count) <= pFlash->lc.falling_ed) //发生跳变
+ 988   3              {
+ 989   4                return count;
+ 990   4              }
+ 991   3          }
+ 992   2          //如果出现跳变，默认增加二个脉冲
+ 993   2          licheng++;
+ 994   2          licheng++;
+ 995   2          //跳变后还原计数
+ 996   2          LC_TH = (u8)((licheng >>8) & 0xFF);
+ 997   2          LC_TL = (u8)(licheng & 0xFF);
+ 998   2          switch(pFlash->lc.pin)
+ 999   2          {
+1000   3                    case  LC_T0: 
+1001   3                                 TR0=0;         //停止
+1002   3                                 TH0 = LC_TH;   //使用计数器TO
+1003   3                                 TL0 = LC_TL;
+1004   3                                 TR0=1;         //计数器0开始计数
+1005   3                                 break;
+1006   3                    case  LC_T1:             //使用计数器T1
+1007   3                                 TR1=0;         //计数器1开始计数
+1008   3                                 TH1 = LC_TH;
+1009   3                                 TL1 = LC_TL;
+1010   3                                 TR1=1;         //计数器1开始计数
+1011   3                                 break;
+1012   3                #ifdef  STC15W4K48S4
+              
+                            case  LC_T2:             //使用计数器T2
+                                         T2H = LC_TH;
+                                         T2L = LC_TL;
+                                         //AUXR |= 0x10;  //计数器2开始计数
+                                         break;
+                            
+              
+                            case  LC_T3:             //使用计数器T3
+                                         T3H = LC_TH;
+                                         T3L = LC_TL;
+                                         //AUXR |= 0x08;  //计数器3开始计数
+                                         break;
+                            
+                            case  LC_T4:             //使用计数器T4
+                                         T4H = LC_TH;
+                                         T4L = LC_TL;
+                                         //AUXR |= 0x80;  //计数器4开始计数
+                                         break;
+                        #endif
+1033   3      
+1034   3                    default:
+1035   3                      
+1036   3                          return  0;        
+1037   3          }
+1038   2          return licheng; //里程值保持不变
+1039   2        }
+1040   1        return count;
+1041   1      
+1042   1      }
+1043          
+1044          
+1045          
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 18  
+
+1046          
+1047          #ifdef  STC15W4K48S4
+              
+              //========================================================================
+              // 函数: u8 toukui(void)
+              // 描述: 获取摩托车头盔状态
+              // 参数：pFlash，
+              // 返回: 戴上返回TURE，取下返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 toukui(void)    //摩托车头盔
+              {
+                u8 tk_pin = BSP_ReadInputDataBit(&pFlash->tk);//读取输入状态
+                
+                return tk_pin;
+              
+              }
+              //========================================================================
+              // 函数: u8 zuobashou(void)
+              // 描述: 获取摩托车左把手状态
+              // 参数：pFlash，
+              // 返回: 握住返回TURE，离开返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 zuobashou(void)    //摩托车左把手
+              {
+                u8 zbs_pin = BSP_ReadInputDataBit(&pFlash->zbs);//读取输入状态
+                
+                return zbs_pin;
+              
+              }
+              //========================================================================
+              // 函数: u8 youbashou(void)
+              // 描述: 获取摩托车右把手状态
+              // 参数：pFlash，
+              // 返回: 握住返回TURE，离开返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 youbashou(void)    //摩托车右把手
+              {
+                u8 ybs_pin = BSP_ReadInputDataBit(&pFlash->ybs);//读取输入状态
+                
+                return ybs_pin;
+              
+              }
+              //========================================================================
+              // 函数: u8 zuojiaotaban(void)
+              // 描述: 获取摩托车右把手状态
+              // 参数：pFlash，
+              // 返回: 踩住返回TURE，离开返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 zuojiaotaban(void)    //摩托车左脚踏板
+              {
+                u8 zjtb_pin = BSP_ReadInputDataBit(&pFlash->zjtb);//读取输入状态
+                
+                return zjtb_pin;
+              
+              }
+              //========================================================================
+              // 函数: u8 youtaban(void)
+              // 描述: 获取摩托车右把手状态
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 19  
+
+              // 参数：pFlash，
+              // 返回: 踩住返回TURE，离开返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 youjiaotaban(void)    //摩托车右脚踏板
+              {
+                u8 yjtb_pin = BSP_ReadInputDataBit(&pFlash->yjtb);//读取输入状态
+                
+                return yjtb_pin;
+              
+              }
+              //========================================================================
+              // 函数: u8 youtaban(void)
+              // 描述: 获取摩托车前手刹状态
+              // 参数：pFlash，
+              // 返回: 刹住住返回TURE，离开返回FLASE
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static u8 qianshousha(void)    //摩托车前手刹
+              {
+                u8 qss_pin = BSP_ReadInputDataBit(&pFlash->qss);//读取输入状态
+                
+                return qss_pin;
+              
+              }
+              
+              //========================================================================
+              // 函数: u8 GetHSShockSensor_value(u8 bump_usart)
+              // 描述: 采集高森碰杆传感器的数据
+              // 参数：bump_usart传感器与主板之间的串口号，FlashParameterTypeDef数据结构
+              // 返回: 
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static void GetHSShockSensor_value(u8 bump_usart)    //得到高森碰杆传感器的值
+              {
+                xdata u8 group_i = 0;//
+                xdata u8 temp = 0;//
+                xdata u16 value = 0;//
+                xdata u8 valuebit = 0;//
+                xdata u8 reset_valuebit = 0;//
+                xdata u8 i = 0;
+                static u8 gor_i = 0;
+                static u8 pos_i = 0;
+                
+                if(bump_usart == DISABLE) //硬件串口未初始化
+                {
+                  return;
+                }
+              
+                if(gor_i == 0)//轮询一轮之后，将状态全部清零，进入下一轮轮询检查
+                { 
+                  pilepole.name   = 0;  //上传碰杆状态  清零
+                  pilepole.number = 0;  //上传碰杆状态  清零    
+                  pilepole.value  = 0;  //上传碰杆位置  清零
+                }
+                
+                if (Serial_HighSensorShock_Analy(bump_usart) == TURE)//读取到串口数据
+                {
+                
+                      for (group_i = 0; group_i < sizeof(pFlash->bump)/sizeof(pFlash->bump[0]);group_i++)
+                      {
+                        
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 20  
+
+                        if((pFlash->bump[group_i].name == 0)||(pFlash->bump[group_i].name == 0xff)) //如果没有配置项�
+             -�碰杆
+                        {
+                            break;//flash里面未配置碰杆接收项目
+                        }
+                        value  =   pFlash->bump[group_i].value;//取碰杆状态
+                        
+                        //printf("value = %h04X\r\n",value);
+                        
+                        for (i = 0 ; i< pFlash->bump[group_i].count;i++)
+                        {   
+                          valuebit  = (u16)(value >> i) & (0x0001);//取出碰杆位
+                          
+                          temp = BSP_ReadBumpDataBit(&pFlash->pgjs,group_i,valuebit,i);//消抖处理
+                          
+                          if( temp == 0 )
+                          {
+                            pFlash->bump[group_i].value &= ~(1<< i);//更新消抖处理结果
+                          }
+                          else 
+                            pFlash->bump[group_i].value |= (1<< i);//更新消抖处理结果
+                        }
+                        //printf("pole->bump[group_i].value = %h04X\r\n",pole->bump[group_i].value);
+                        
+                        
+                      }
+                      //由于需要轮询碰杆状态，所以需要第二次遍历，并且需要记录遍历的位置
+                      for ( ;gor_i < sizeof(pFlash->bump)/sizeof(pFlash->bump[0]);gor_i++)
+                      {
+                        
+                        if((pFlash->bump[gor_i].name == 0)||(pFlash->bump[gor_i].name == 0xff)) //如果没有配置项目碰
+             -杆
+                        {
+                          gor_i = 0;
+                          break;//flash里面未配置碰杆接收项目
+                        }
+                        
+                        value  =  pFlash->bump[gor_i].value;//取碰杆状态
+                        
+                        //printf("penggan.value = %h04X\r\n",value);
+                        
+                        for (;pos_i< pFlash->bump[gor_i].count;pos_i++)
+                        {
+                          
+                          valuebit = (u8)(value >> pos_i) & (0x0001);//取出碰杆位
+                          
+                          reset_valuebit = (u8)((pFlash->bump[gor_i].reset_value >> pos_i) & (u8)0x01);//取出桩杆状态，
+             -判断是否出现复位信号
+                          
+                          //printf("reset_valuebit = %b02d   pos_i = %b02d\r\n", reset_valuebit,pos_i);
+                          
+                          if(valuebit == 1)//出现碰杆信号
+                          {
+                              pilepole.name   = pFlash->bump[gor_i].name;     //上传碰杆状态  
+                            
+                              pilepole.number = pFlash->bump[gor_i].number;   //上传碰杆状态    
+                            
+                              pilepole.value  = pos_i+1;  //上传碰杆位置
+                            
+                              pFlash->bump[gor_i].reset_value |=  (1 << pos_i);//记录复位值，用于桩杆复位时，发�
+             -��复位状态
+                            
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 21  
+
+                             // printf("pos_i = %b02d\r\n", pos_i);
+                            
+                            //  printf("pFlash->bump[%b02d].reset_value = %h04X\r\n", gor_i,pFlash->bump[gor_i].reset_value);
+                            
+                              pos_i++;//本次循环结束
+                             
+              //               printf("penggan.value = %h04X\r\n",value);
+              //               printf("pilepole.name = %b02d\r\n",pilepole.name);
+              //               printf("pilepole.number = %b02d\r\n",pilepole.number);
+              //               printf("pilepole.value = %h04d\r\n",pilepole.value);
+              //               printf("\r\n");
+                            
+                              return;
+                          }
+                          else if(reset_valuebit == 1)//复位信号
+                          {
+                              pilepole.name   = pFlash->bump[gor_i].name;     //清复位杆状态  
+                            
+                              pilepole.number = pFlash->bump[gor_i].number;   //清复位杆状态    
+                            
+                              pilepole.value  = (pos_i+1)|(0x80); //上传复位杆位置,最高位置1，代表复位
+                            
+                              pFlash->bump[gor_i].reset_value &=  ~(1 << pos_i);//清复位状态
+                            
+                              pos_i++;//本次循环结束  
+                            
+                            
+                              return;             
+                          }
+              
+                        }
+                        pos_i = 0;
+                        
+                      }
+                      gor_i = 0;
+                } 
+              }
+              
+              //========================================================================
+              // 函数: u8 Get24GShockSensor_value(u8 Tilt_usart)
+              // 描述: 获取2.4碰杆传感器的值
+              // 参数：u8 bump_usart，2.4G模块与主板之间连接的串口号
+              // 返回: 
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static void Get24GShockSensor_value(u8 bump_usart)    //得到2.4G碰杆碰杆传感器的值
+              {
+              
+                if(bump_usart != DISABLE)
+                {
+                      //memset(&Tilt,0,sizeof(Tilt));//清空数据
+                      pilepole.name   = 0;  //上传碰杆状态  清零
+                      pilepole.number = 0;  //上传碰杆状态  清零    
+                      pilepole.value  = 0;  //上传碰杆位置  清零
+                      Serial_Sensor24GShock_Analy(bump_usart,&pilepole);
+                }
+              }
+              
+              //========================================================================
+              // 函数: u8 GetTiltSensor_value(u8 Tilt_usart,TiltSensorTypeDef *pTilt)
+              // 描述: 获取倾角传感器的值
+              // 参数：u8 Tilt_usart，传感器与主板之间连接的串口号， pTilt指向数据保存的指针
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 22  
+
+              // 返回: 
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              static void GetTiltSensor_value(u8 Tilt_usart,TiltSensorTypeDef *pTilt)    //倾角传感器的值
+              {
+              
+                if (TILT_ALL_USART != DISABLE)//全部读取
+                {
+                    Serial_TiltSensor_Analy(Tilt_usart,pTilt);
+                
+              //     printf("------------------------------------------\r\n");
+              //     printf("Tilt[PLACE_Q_AXLE].Roll = %h04d\r\n",    Tilt[PLACE_Q_AXLE].Roll);
+              //     printf("Tilt[PLACE_Q_AXLE].Pitch = %h04d\r\n",   Tilt[PLACE_Q_AXLE].Pitch);
+              //     printf("Tilt[PLACE_Q_AXLE].Yaw = %h04d\r\n",     Tilt[PLACE_Q_AXLE].Yaw);
+              //     printf("------------------------------------------\r\n");
+                }
+                else
+                {
+                    if(Tilt_usart != DISABLE)//单个读取
+                    {
+                       //memset(pTilt,0,sizeof(Tilt[0]));//清零
+                       if (Serial_TiltSensor_Analy(Tilt_usart,pTilt) == TURE)//单个读取
+                       {
+                         if(Tilt_usart == TILT_MTC_USART) //如果是二轮摩托车
+                         {
+                     
+                            (char)pTilt->RollL -= mtc.Adjust_XL;    //得到X轴差值低字节 
+                            (char)pTilt->RollH -= mtc.Adjust_XH;    //得到X轴差值高字节 
+                            (char)pTilt->PitchL -= mtc.Adjust_YL;  //得到Y轴差值低字节    
+                            (char)pTilt->PitchH -= mtc.Adjust_YH;  //得到Y轴差值高字节  
+                           
+                  //          printf("pTilt->RollL = %b02d\r\n",  pTilt->RollL);
+                  //          printf("pTilt->RollH = %b02d\r\n",  pTilt->RollH);
+                  //          printf("pTilt->PitchL = %b02d\r\n", pTilt->PitchL);
+                  //          printf("pTilt->PitchH = %b02d\r\n", pTilt->PitchH); 
+                  //          printf("\r\n");        
+                         }
+                       }     
+                    }
+                }
+              }
+              
+              
+              
+              //========================================================================
+              // 函数: u8 Get_csb_dbq_value(u8 csb_dbq_usart,CsbTypeDef *pcsb)
+              // 描述: 获取超声波（单边桥）传感器的值
+              // 参数：u8 csb_dbq_usart，传感器与主板之间连接的串口号， pcsb指向数据保存的指�
+             -��
+              // 返回: 
+              // 版本: V1.0, 2023-5-25
+              //========================================================================
+              static void Get_csb_dbq_value(u8 csb_dbq_usart,CsbTypeDef *pcsb)    //超声波（单边桥）传感器的
+             -值
+              {
+              
+                if (csb_dbq_usart != DISABLE)//
+                {
+                    Serial_csb_dbq_Analy(csb_dbq_usart,pcsb);
+                }
+                else
+                {
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 23  
+
+                    pcsb->value0 = 0;//数据清零
+                    pcsb->value1 = 0;
+                    pcsb->value2 = 0;
+                    pcsb->value3 = 0;
+                }
+              }
+              
+              //========================================================================
+              // 函数: u8 Get_csb_sd_value(u8 csb_sd_usart,CsbTypeDef *pcsb)
+              // 描述: 获取超声波（隧道）传感器的值
+              // 参数：u8 csb_sd_usart，传感器与主板之间连接的串口号， pcsb指向数据保存的指�
+             -�
+              // 返回: 
+              // 版本: V1.0, 2023-5-25
+              //========================================================================
+              static void Get_csb_sd_value(u8 csb_sd_usart,CsbTypeDef *pcsb)    //超声波（隧道）传感器的值
+              {
+              
+                if (csb_sd_usart != DISABLE)//
+                {
+                    Serial_csb_sd_Analy(csb_sd_usart,pcsb);
+                }
+                else
+                {
+                    pcsb->value0 = 0;//数据清零
+                    pcsb->value1 = 0;
+                    pcsb->value2 = 0;
+                    pcsb->value3 = 0;
+                }
+              }
+              
+              //========================================================================
+              // 函数: void GetTilt_Adjust_vaule(void) //获取摩托车倾角传感器校准值
+              // 描述: 获取二轮摩托车倾角传感器校准基准值
+              // 参数：
+              // 返回: 
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              void GetTilt_Adjust_vaule(void) //获取二轮摩托车倾角传感器校准值
+              {
+                if(TILT_MTC_USART != DISABLE)
+                {
+                  USART_ClearMsgQueueRxBuffer(TILT_MTC_USART);//清理串口缓存
+                
+                  BSP_ClearUsartRxBuffer(TILT_MTC_USART);//
+                
+                  delay_ms(200);//延时300毫秒读取基准值
+                  
+                  GetTiltSensor_value(TILT_MTC_USART,&Tilt[PLACE_MTC_AXLE]);//获取基准值
+                  mtc.Adjust_XL = Tilt[PLACE_MTC_AXLE].RollL;         //X轴角度低字节 
+                  mtc.Adjust_XH = Tilt[PLACE_MTC_AXLE].RollH;         //X轴角度高字节
+                  mtc.Adjust_YL = Tilt[PLACE_MTC_AXLE].PitchL;          //Y轴角度低字节
+                  mtc.Adjust_YH = Tilt[PLACE_MTC_AXLE].PitchH;          //Y轴角度高字节 
+                  
+              //    printf("mtc.Adjust_XL = %b02d\r\n", mtc.Adjust_XL);
+              //    printf("mtc.Adjust_XH = %b02d\r\n", mtc.Adjust_XH);
+              //    printf("mtc.Adjust_YL = %b02d\r\n",mtc.Adjust_YL);
+              //    printf("mtc.Adjust_YH = %b02d\r\n",mtc.Adjust_YH);  
+                }
+              }
+              #endif
+1410          //========================================================================
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 24  
+
+1411          // 函数: void DefaultConfig_Init(void)
+1412          // 描述: 初始化默认配置
+1413          // 参数：无
+1414          // 版本: V1.0, 2022-10-17
+1415          //========================================================================
+1416          void GetFlashConfig(void)
+1417          {
+1418   1        
+1419   1          BSP_GetFlashConfig(); //获取配置参数
+1420   1        
+1421   1          if(pFlash->zz.pin == 0)       pFlash->zz.pin    = D1;   //左转,默认端口为D1
+1422   1          if(pFlash->yz.pin == 0)       pFlash->yz.pin    = D2;   //右转,默认端口为D2
+1423   1          if(pFlash->xh.pin == 0)       pFlash->xh.pin    = D3;   //发电机,默认端口为D3
+1424   1          if(pFlash->ss.pin == 0)       pFlash->ss.pin    = D4;   //手刹,默认端口为D4
+1425   1          if(pFlash->aqd.pin == 0)      pFlash->aqd.pin   = D5;   //安全带,默认端口为D5 
+1426   1          if(pFlash->cm.pin == 0)       pFlash->cm.pin    = D6;   //车门,默认端口为D6
+1427   1          if(pFlash->dcd.pin == 0)      pFlash->dcd.pin   = D7;   //倒车灯,默认端口为D7
+1428   1          if(pFlash->lb.pin == 0)       pFlash->lb.pin    = D8;   //喇叭,默认端口为D8
+1429   1        
+1430   1          if(pFlash->rc.pin1 == 0)      pFlash->rc.pin1   = D9;   //绕车1,默认端口为D9
+1431   1          if(pFlash->rc.pin2 == 0)      pFlash->rc.pin2   = D10;  //绕车2,默认端口为D10
+1432   1          if(pFlash->wd.pin == 0)       pFlash->wd.pin    = D11;  //雾灯,默认端口为D11
+1433   1          if(pFlash->yg.pin == 0)       pFlash->yg.pin    = D12;  //远光,默认端口为D12
+1434   1          if(pFlash->jg.pin == 0)       pFlash->jg.pin    = D13;  //近光,默认端口为D13 
+1435   1          if(pFlash->xd.pin == 0)       pFlash->xd.pin    = D14;  //小灯,默认端口为D14
+1436   1          if(pFlash->js.pin == 0)       pFlash->js.pin    = D15;  //脚刹,默认端口为D15
+1437   1          if(pFlash->ys.pin == 0)       pFlash->ys.pin    = D16;  //雨刷,默认端口为D16
+1438   1        
+1439   1          if(pFlash->zhs.pin == 0)      pFlash->zhs.pin   = D17;  //左后视镜,默认端口为D17
+1440   1          if(pFlash->qd.pin == 0)       pFlash->qd.pin    = D18;  //启动,默认端口为D18
+1441   1          if(pFlash->nhs.pin == 0)      pFlash->nhs.pin   = D19;  //内后视镜,默认端口为D19
+1442   1          if(pFlash->zytj.pin == 0)     pFlash->zytj.pin  = D20;  //远座椅(压力,默认端口为D20
+1443   1          if(pFlash->dw.pin1 == 0)      pFlash->dw.pin1   = D21;  //挡位1,默认端口为D21  
+1444   1          if(pFlash->dw.pin2 == 0)      pFlash->dw.pin2   = D22;  //挡位2,默认端口为D22
+1445   1          if(pFlash->dw.pin3 == 0)      pFlash->dw.pin3   = D23;  //挡位3,默认端口为D23
+1446   1          if(pFlash->dw.pin4 == 0)      pFlash->dw.pin4   = D24;  //挡位4,默认端口为D24
+1447   1          if(pFlash->dw.pin5 == 0)      pFlash->dw.pin5   = D0;   //挡位5,默认端口为D0，待分配
+1448   1          if(pFlash->sj.pin == 0)       pFlash->sj.pin    = D0;   //示警开关,默认端口为D0，待分配
+1449   1          
+1450   1          if(pFlash->zyyl.pin == 0)     pFlash->zyyl.pin  = D25;  //调座椅,默认端口为D25
+1451   1          
+1452   1      #ifdef  STC15W4K48S4
+                  //一体板转速和离合信号端口调换
+                  if(pFlash->lh.pin == 0)       pFlash->lh.pin    = D27;  //离合,默认端口为D26
+                  if(pFlash->zs.pin == 0)       pFlash->zs.pin    = D26;  //转速,默认端口为D27
+              #endif
+1457   1          
+1458   1      #ifdef  STC12C5A60S2
+1459   1          if(pFlash->lh.pin == 0)       pFlash->lh.pin    = D26;  //离合,默认端口为D26
+1460   1          if(pFlash->zs.pin == 0)       pFlash->zs.pin    = D27;  //转速,默认端口为D27
+1461   1      #endif
+1462   1      
+1463   1          if(pFlash->ysm.pin == 0)      pFlash->ysm.pin   = D28;//钥匙开关,默认端口为D28
+1464   1          if(pFlash->fsc.pin == 0)      pFlash->fsc.pin   = D29;//副刹车,默认端口为D29  
+1465   1          if(pFlash->cd.pin == 0)       pFlash->cd.pin    = D30;//闯动传感器,默认端口为D30
+1466   1          //if(pFlash->dw3.pin == 0)    pFlash->dw3.pin   = D31;//备用,默认端口为D31
+1467   1          if(pFlash->rc.pin3 == 0)      pFlash->rc.pin3   = D32;//绕车3,默认端口为D32
+1468   1          if(pFlash->begin.pin == 0)    pFlash->begin.pin = D0;//开始考试信号线，默认端口为D0，待分�
+             -��
+1469   1          
+1470   1      #ifdef  STC15W4K48S4      
+                
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 25  
+
+                  if(pFlash->tk.pin == 0)       pFlash->tk.pin  = D5;   //安全带,默认端口为D5     //摩托车头盔
+                  if(pFlash->zbs.pin == 0)      pFlash->zbs.pin   = D17;//左后视镜,默认端口为D17   //摩托车左把�
+             -�
+                  if(pFlash->ybs.pin == 0)      pFlash->ybs.pin = D19;  //内后视镜,默认端口为D19   //摩托车右把�
+             -�
+                  if(pFlash->zjtb.pin == 0)     pFlash->zjtb.pin = D6;  //车门,默认端口为D6        //摩托车左脚踏板
+                  if(pFlash->yjtb.pin == 0)     pFlash->yjtb.pin = D16; //雨刷,默认端口为D16       //摩托车右脚踏�
+             -��
+                  if(pFlash->qss.pin == 0)      pFlash->qss.pin = D29;  //副刹车,默认端口为D29      //摩托车前手刹
+                  
+                  if(pFlash-> upload.com > 4)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> gps.com > 4)      pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> bump_hs.com > 4)  pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> bump_24g.com > 4) pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> titl_all.com > 4) pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  
+                  if(pFlash-> titl_q.com > 4)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> titl_h.com > 4)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> titl_g.com > 4)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> titl_mtc.com > 4) pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  
+                  if(pFlash-> csb_dbq.com > 4)  pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  if(pFlash-> csb_sd.com > 4)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+                  
+                  if(pFlash-> upload.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> gps.bote > 10)      pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> bump_hs.bote > 10)  pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> bump_24g.bote > 10) pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> titl_all.bote > 10) pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  
+                  if(pFlash-> titl_q.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> titl_h.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> titl_g.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> titl_mtc.bote > 10) pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  
+                  if(pFlash-> csb_dbq.bote > 10)  pFlash-> upload.bote  = DISABLE;//波特率超出范围
+                  if(pFlash-> csb_sd.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+              #endif
+1507   1      
+1508   1      #ifdef  STC12C5A60S2
+1509   1          if(pFlash-> upload.com > 2)   pFlash-> upload.com   = DISABLE;//串口号超出范围
+1510   1          if(pFlash-> upload.bote > 10)   pFlash-> upload.bote  = DISABLE;//波特率超出范围
+1511   1      #endif
+1512   1          
+1513   1      
+1514   1          
+1515   1      }
+1516          //========================================================================
+1517          // 函数: void GetDataPack(u8 *pData，u16 lenth)
+1518          // 描述: 获取按照通讯协议的打包数据.
+1519          // 参数: pData指向发给串口的数据数组,lenth需要获取的数据长度.
+1520          // 返回: 无.
+1521          // 版本: V1.0, 2022-10-17
+1522          //========================================================================
+1523          void GetBaseBoardDataPack(u8 pDatabuf[], u16 lenth)
+1524          {
+1525   1            
+1526   1            static xdata u8 count=0;
+1527   1            dbugGearr = 0;
+1528   1        
+1529   1      #ifdef  STC15W4K48S4    
+                
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 26  
+
+                    GetHSShockSensor_value(BUMP_HS_USART);//更新碰杆数据
+                    Get24GShockSensor_value(BUMP_24G_USART);//更新碰杆数据
+                    GetTiltSensor_value(TILT_Q_USART,&Tilt[PLACE_Q_AXLE]);//采集前轴数据
+                    GetTiltSensor_value(TILT_H_USART,&Tilt[PLACE_H_AXLE]);//采集后轴数据
+                    GetTiltSensor_value(TILT_G_USART,&Tilt[PLACE_G_AXLE]);//采集挂轴数据
+                    GetTiltSensor_value(TILT_MTC_USART,&Tilt[PLACE_MTC_AXLE]);  //采集二轮摩托车倾角数据
+                    GetTiltSensor_value(TILT_ALL_USART,Tilt); //采集汇总后的倾角数据
+                    Get_csb_dbq_value(CSB_DBQ_USART,&csb_dbq);//采集超声波（单边桥）数据
+                    Get_csb_sd_value(CSB_SD_USART,&csb_sd);//采集超声波（单边桥）数据
+              
+              #endif
+1542   1        
+1543   1            zhuansu=zhuansucount();
+1544   1            licheng=lichengcount();
+1545   1        
+1546   1            pDatabuf[0] |= (jiaosha() << 0);              //脚杀
+1547   1            pDatabuf[0] |=  (lihe() << 1);              //离合器       
+1548   1            pDatabuf[0] |=  (jinguang() << 2);            //近光灯
+1549   1            pDatabuf[0] |=  (yuanguang() << 3);         //远光灯 
+1550   1            pDatabuf[0] |=  (youzhuanxiangdeng() << 4); //右转向     
+1551   1            pDatabuf[0] |=  (zuozhuanxiangdeng() << 5); //左转向
+1552   1            pDatabuf[0] |=  (shousha()<<6);             //手刹
+1553   1            pDatabuf[0] |=  (zuoyitiaojie()<<7);          //座椅
+1554   1            
+1555   1            pDatabuf[1] |=  (laba() << 0);        //喇叭
+1556   1            pDatabuf[1] |=  (daochedeng() << 2);  //倒车灯开关   
+1557   1            pDatabuf[1] |=  (xiaodeng() << 3);    //小灯
+1558   1            pDatabuf[1] |=  (shijing() << 4);   //双闪
+1559   1            pDatabuf[1] |=  (anquandai() << 5); //安全带开关    
+1560   1            pDatabuf[1] |=  (qidong() << 6);      //启动开关
+1561   1            pDatabuf[1] |=  (xihuo() << 7);     //发动机转速
+1562   1        
+1563   1            pDatabuf[2] |=  chemen();   //车门
+1564   1            pDatabuf[2] |=  dangwei();    //挡位
+1565   1      
+1566   1            pDatabuf[3] = 0;      //车速
+1567   1            pDatabuf[4] |=  (u8)zhuansu;      //发动机转速低八位   
+1568   1            pDatabuf[5] |=  (u8)(zhuansu>>8);   //发动机转速高八位
+1569   1            
+1570   1            pDatabuf[6] |=  (kongdang() << 0);    //空挡
+1571   1            pDatabuf[6] |=  (zuoyiyali() << 3); //座椅开关
+1572   1            
+1573   1            pDatabuf[7] |=  (yushua() << 0);      //雨刷
+1574   1            pDatabuf[7] |=  (wudeng() << 1);      //雾灯
+1575   1            pDatabuf[7] |=  (neihoushi() << 2); //内后视
+1576   1            pDatabuf[7] |=  (zuohoushi() << 3); //后视左
+1577   1            pDatabuf[7] |=  (jinguang() << 4);    //大灯
+1578   1            pDatabuf[7] |=  (yuanguang() << 4); //大灯
+1579   1            pDatabuf[7] |=  (fushache() << 5);  //副刹
+1580   1            pDatabuf[7] |=  (qidong() << 6);    //启动
+1581   1            //pDatabuf[8]=0;      //红绿灯状态
+1582   1            //pDatabuf[9]=0;      //异常状态
+1583   1            
+1584   1            pDatabuf[9] |=  (begin() << 7);     //开启上位软件自由训练（1=开启，0=结束）
+1585   1            
+1586   1            if(pFlash->rc.type == 0) //按钮
+1587   1            {
+1588   2              pDatabuf[10]  = raoche1();  //左前绕车
+1589   2              pDatabuf[11]  = raoche2();  //左后绕车
+1590   2              pDatabuf[12]  = raoche1();  //右前绕车
+1591   2              pDatabuf[13]  = raoche3();  //右后绕车
+1592   2            }
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 27  
+
+1593   1            else if(pFlash->rc.type == 6) 
+1594   1            {
+1595   2              pDatabuf[10]  = raoche2();  
+1596   2              pDatabuf[11]  = raoche1();  
+1597   2              pDatabuf[12]  = raoche2();  
+1598   2              pDatabuf[13]  = raoche3();  
+1599   2            }
+1600   1      #ifdef  STC15W4K48S4  
+                    else if(pFlash->rc.type == 1)//超声波传感器
+                    {
+                      pDatabuf[10]  = csb_sd.value0;  //
+                      pDatabuf[11]  = csb_sd.value1;  //
+                      pDatabuf[12]  = csb_sd.value2;  //
+                      pDatabuf[13]  = csb_sd.value3;  //      
+                    }
+              #endif  
+1609   1            
+1610   1          if(pFlash->dw.type == 255 )       //挡位自定义模式
+1611   1            {
+1612   2              pDatabuf[10]  = 0xff;         //
+1613   2              pDatabuf[11]  = 0xff;         //
+1614   2              pDatabuf[12]  = 0xff;         //
+1615   2              pDatabuf[13]  = dbugGearr;    //在软件上显示采样到的挡位值
+1616   2            }
+1617   1            
+1618   1            pDatabuf[14]  = (u8)(licheng>>8);     //里程计数高位//计数器0
+1619   1            pDatabuf[15]  = (u8)licheng;          //里程计数低位//计数器0
+1620   1            
+1621   1            //*pDatabuf[16] = 0;      //备用
+1622   1            pDatabuf[17]  = (pFlash->board.number_H); //板号高位
+1623   1            pDatabuf[18]  = (pFlash->board.number_L); //板号低位
+1624   1            
+1625   1      #ifdef  STC15W4K48S4        
+                    pDatabuf[19]  = csb_dbq.value0;     //汽车前轴左侧超声波传感器对地面的距离（单位厘�
+             -�）
+                    pDatabuf[20]  = csb_dbq.value1;     //汽车前轴右侧超声波传感器对地面的距离（单位厘�
+             -�）
+                    pDatabuf[21]  = csb_dbq.value2;     //汽车后轴左侧超声波传感器对地面的距离（单位厘�
+             -�）
+                    pDatabuf[22]  = csb_dbq.value3;     //汽车后轴右侧超声波传感器对地面的距离（单位厘�
+             -�）
+              #endif
+1631   1            
+1632   1            pDatabuf[23]  = 0;      //牵引车中轴左侧超声波传感器对地面的距离（单位厘米）
+1633   1            pDatabuf[24]  = 0;      //牵引车中轴右侧超声波传感器对地面的距离（单位厘米）
+1634   1            
+1635   1            pDatabuf[25]  = 0;              //训练圈数计数高位
+1636   1            pDatabuf[26]  = 0;              //训练圈数计数低位
+1637   1            
+1638   1            if(pFlash->dw.type == 8 || pFlash->dw.type == 9)  //挡位自定义模式
+1639   1              pDatabuf[26]  = dbugGearr;    //在软件上显示采样到的挡位值
+1640   1      
+1641   1      
+1642   1            
+1643   1            pDatabuf[27]  = 0;        //车速高位
+1644   1            pDatabuf[28]  = 0;        //车速低位
+1645   1      
+1646   1            pDatabuf[29]  = 0;        //离合AD值
+1647   1            pDatabuf[30]  = 0;        //油门AD值
+1648   1            
+1649   1            pDatabuf[31]    |=  (yaoshimen() << 0);       //钥匙开关
+1650   1            pDatabuf[31]    |=  (chuangdong() << 1);      //闯动开关
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 28  
+
+1651   1            
+1652   1      #ifdef  STC15W4K48S4  
+                    pDatabuf[31]    |=  (toukui() << 2);      //头盔（1=戴上）//摩托车
+                    pDatabuf[31]    |=  (zuobashou() << 3);   //左把手（1=握上）//摩托车
+                    pDatabuf[31]    |=  (youbashou() << 4);   //右把手（1=握上）//摩托车
+                    pDatabuf[31]    |=  (zuojiaotaban() << 5);      //左踏板（1=踩上）//摩托车
+                    pDatabuf[31]    |=  (youjiaotaban() << 6);      //右踏板（1=踩上）//摩托车
+              #endif
+1659   1            //*pDatabuf[31]   |=  (youmentaban() << 7); //1=油门踏板 
+1660   1            
+1661   1            
+1662   1            pDatabuf[32]    = FIRMWARE_NUM;     //车载单片机固件号
+1663   1            pDatabuf[33]    = 0xff;     //方向盘转角,软件未使用，作为日志数据标记使用
+1664   1            //*pDatabuf[33]   = 0;              //方向盘转角
+1665   1      
+1666   1            pDatabuf[34]    |=  (DBQ_LeftFront()<<7);    //单边桥左前轮信号    （1=不在桥上，0=在桥上
+             -）
+1667   1            pDatabuf[34]    |=  (DBQ_LeftRear()<<6);     //单边桥左后轮信号    （1=不在桥上，0=在桥上
+             -）
+1668   1            pDatabuf[34]    |=  (DBQ_RightFront()<<5);   //单边桥右前轮信号    （1=不在桥上，0=在桥上
+             -）
+1669   1            pDatabuf[34]    |=  (DBQ_RightRear()<<4);    //单边桥右后轮信号    （1=不在桥上，0=在桥上
+             -）
+1670   1            pDatabuf[34]    |=  (DBQ_LeftMiddle()<<3);   //单边桥左挂车轮信号  （1=不在桥上，0=在桥�
+             -�）
+1671   1            pDatabuf[34]    |=  (DBQ_RightMiddle()<<2);  //单边桥右挂车轮信号  （1=不在桥上，0=在桥�
+             -�）
+1672   1            //*pDatabuf[34]   |=  ((gaosujingshi()&0x01)<<1);     //1=高速警示标志
+1673   1            //*pDatabuf[34]   |=  ((gaosuanquan()&0x01)<<0);      //1=高速安全区域//无锡检测使用
+1674   1      #ifdef  STC15W4K48S4  
+                    
+                    pDatabuf[35]      =   pilepole.name;        //项目类型--01桩考，02限宽门，03牵引车桩考，04连�
+             -��障碍，05单边桥
+                    pDatabuf[36]      =   pilepole.number;      //项目编号01，02，03....
+                    pDatabuf[37]      =   (u8)pilepole.value;   //碰杆位置01，02，03，04，05，06...（00=无碰杆）
+                
+                    //*pDatabuf[38]   = 0;    //接近开关
+                    //*pDatabuf[39]   = 0;    //科大讯飞语音状态，41正在合成，4F合成完毕，00空闲状态 
+                    pDatabuf[40]      = (char)Tilt[PLACE_Q_AXLE].Pitch; //单边桥车前Y轴数据（[有符号char]，取小
+             -数点后一位，*10倍上传）
+                    pDatabuf[41]      = (char)Tilt[PLACE_H_AXLE].Pitch; //单边桥车后Y轴数据（[有符号char]，取小
+             -数点后一位，*10倍上传）
+                    pDatabuf[42]      = (char)Tilt[PLACE_G_AXLE].Pitch; //单边桥车挂Y轴数据（[有符号char]，取小
+             -数点后一位，*10倍上传）
+                    pDatabuf[43]      = (char)Tilt[PLACE_MTC_AXLE].RollL;   //（二轮摩托）车身Y轴原始数据-低位 �
+             -��横滚角，右倾为正：右低左高，正。）
+                    pDatabuf[44]      = (char)Tilt[PLACE_MTC_AXLE].RollH;   //（二轮摩托）车身Y轴原始数据-高位
+                    pDatabuf[45]      = (char)Tilt[PLACE_MTC_AXLE].PitchL;    // (二轮摩托）车身X轴原始数据-低位 �
+             -��俯仰角，仰为正）
+                    pDatabuf[46]      = (char)Tilt[PLACE_MTC_AXLE].PitchH;    //（二轮摩托）车身X轴原始数据-高位
+              #endif    
+1690   1            if(pFlash->board.device_type == 1)  //手持设备
+1691   1            {
+1692   2              pDatabuf[47]      |= (1<<7);
+1693   2            }
+1694   1            pDatabuf[47]      |=    ID_LENTH; //主板序列号字节数（便于以后其他系列升级）
+1695   1            
+1696   1      
+1697   1            
+1698   1            pDatabuf[48]      =   localid[0];
+1699   1            pDatabuf[49]      =   localid[1];
+1700   1            pDatabuf[50]      =   localid[2];
+C51 COMPILER V9.60.0.0   SIGNAL                                                            09/20/2025 15:17:35 PAGE 29  
+
+1701   1            pDatabuf[51]      =   localid[3];
+1702   1            pDatabuf[52]      =   localid[4];
+1703   1            pDatabuf[53]      =   localid[5];
+1704   1            pDatabuf[54]      =   localid[6];
+1705   1      
+1706   1      
+1707   1            pDatabuf[55]    |=  (guanchayibiao() << 0);//观察仪表盘
+1708   1            
+1709   1      #ifdef  STC15W4K48S4
+              
+                    pDatabuf[55]    |=  (qianshousha() << 1);//摩托车前手刹信号
+                    
+              #endif
+1714   1            
+1715   1            pDatabuf[lenth-2]   = count++;    //数据标签为数据长度的倒数第二位,每次增加1 
+1716   1            
+1717   1            Checksum(pDatabuf,lenth);//计算校验和    
+1718   1      
+1719   1      } 
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   6593    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     17      28
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

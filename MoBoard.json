@@ -1,0 +1,1377 @@
+[
+    {
+        "Name": "VerNo",
+        "Address": "",
+        "Description": "配置文件版本号：",
+        "Value": "2.0.2增加通讯串口配置参数"
+    },
+    {
+        "Name": "主板与工控机连接的串口",
+        "Address": "0001",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与工控机连接的串口波特率",
+        "Address": "0002",
+        "Description": "0=DISABLE,1=115200,2=38400,4=9600",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与GPS板卡连接的串口",
+        "Address": "0003",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与GPS板卡连接的串口波特率",
+        "Address": "0004",
+        "Description": "0=DISABLE,1=115200,2=38400,4=9600",
+        "Value": "0"
+    },	
+
+    {
+        "Name": "主板与高森碰杆传感器之间连接的串口",
+        "Address": "0005",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与高森碰杆传感器之间连接的串口波特率",
+        "Address": "0006",
+        "Description": "0=DISABLE,1=115200,2=38400,4=9600",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与2.4G接收模块（碰杆传感器）之间连接的串口",
+        "Address": "0007",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },	
+    {
+        "Name": "主板与2.4G接收模块（碰杆传感器）之间连接的串口波特率",
+        "Address": "0008",
+        "Description": "0=DISABLE,1=115200,2=38400,4=9600",
+        "Value": "0"
+    },
+    {
+        "Name": "主板与倾角传感器（汇总后）连接的串口号",
+        "Address": "0009",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },	
+	{
+        "Name": "主板与前轴倾角传感器的连接串口（单传感器连接）",
+        "Address": "000A",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },
+	{
+        "Name": "主板与后轴倾角传感器的连接串口（单传感器连接）",
+        "Address": "000B",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },
+	{
+        "Name": "主板与挂轴倾角传感器的连接串口（单传感器连接）",
+        "Address": "000C",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },
+	{
+        "Name": "主板与二轮摩托车倾角传感器的连接串口（单传感器连接）",
+        "Address": "000D",
+        "Description": "0=DISABLE,1,2(网口),3,4",
+        "Value": "0"
+    },
+    {
+        "Name": "主板与倾角传感器的连接串口波特率",
+        "Address": "000E",
+        "Description": "0=DISABLE,1=115200,2=38400,4=9600",
+        "Value": "0"
+    },
+    {
+        "Name": "座椅信号（调节）接入端口号",
+        "Address": "0020",
+        "Description": "信号输入端口取值1--32，0=默认D20",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号开关（调节）类型",
+        "Address": "0021",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号（调节）下降沿消抖延时",
+        "Address": "0022",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号（调节）上升降沿消抖延时",
+        "Address": "0023",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号（调节）传感器类型",
+        "Address": "0024",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "手刹信号接入端口号",
+        "Address": "0028",
+        "Description": "信号输入端口取值1--32，0=默认D4",
+        "Value": "0"
+    },
+	{
+        "Name": "手刹信号开关类型",
+        "Address": "0029",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "手刹信号下降沿消抖延时",
+        "Address": "002A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	
+	{
+        "Name": "手刹信号上升降沿消抖延时",
+        "Address": "002B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "手刹信号传感器类型",
+        "Address": "002C",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "左转信号接入端口号",
+        "Address": "0030",
+        "Description": "信号输入端口取值1--32，0=默认D1",
+        "Value": "0"
+    },
+	{
+        "Name": "左转信号开关类型",
+        "Address": "0031",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "左转信号下降沿消抖延时",
+        "Address": "0032",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "左转信号上升降沿消抖延时",
+        "Address": "0033",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "左转信号传感器类型",
+        "Address": "0034",
+        "Description": "0=默认",
+        "Value": "0"
+    },		
+	{
+        "Name": "右转信号接入端口号",
+        "Address": "0038",
+        "Description": "信号输入端口取值1--32，0=默认D2",
+        "Value": "0"
+    },
+	{
+        "Name": "右转信号开关类型",
+        "Address": "0039",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "右转信号下降沿消抖延时",
+        "Address": "003A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "右转信号上升降沿消抖延时",
+        "Address": "003B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "右转信号传感器类型",
+        "Address": "003C",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "远光信号接入端口号",
+        "Address": "0040",
+        "Description": "信号输入端口取值1--32，0=默认D12",
+        "Value": "0"
+    },
+	{
+        "Name": "远光信号开关类型",
+        "Address": "0041",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "远光信号下降沿消抖延时",
+        "Address": "0042",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "远光信号上升降沿消抖延时",
+        "Address": "0043",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "远光信号传感器类型",
+        "Address": "0044",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "近光信号接入端口号",
+        "Address": "0048",
+        "Description": "信号输入端口取值1--32，0=默认D13",
+        "Value": "0"
+    },
+	{
+        "Name": "近光信号开关类型",
+        "Address": "0049",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "近光信号下降沿消抖延时",
+        "Address": "004A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "近光信号上升降沿消抖延时",
+        "Address": "004B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "近光信号传感器类型",
+        "Address": "004C",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "离合信号接入端口号",
+        "Address": "0050",
+        "Description": "信号输入端口取值1--32，0=默认D26",
+        "Value": "0"
+    },
+	{
+        "Name": "离合信号开关类型",
+        "Address": "0051",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "离合信号下降沿消抖延时",
+        "Address": "0052",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "离合信号上升降沿消抖延时",
+        "Address": "0053",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "离合信号传感器类型",
+        "Address": "0054",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "脚刹信号接入端口号",
+        "Address": "0058",
+        "Description": "信号输入端口取值1--32，0=默认D15",
+        "Value": "0"
+    },
+	{
+        "Name": "脚刹信号开关类型",
+        "Address": "0059",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "脚刹信号下降沿消抖延时",
+        "Address": "005A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "脚刹信号上升降沿消抖延时",
+        "Address": "005B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "脚刹信号传感器类型",
+        "Address": "005C",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "熄火信号接入端口号",
+        "Address": "0060",
+        "Description": "信号输入端口取值1--32，0=默认D3",
+        "Value": "0"
+    },
+	{
+        "Name": "熄火信号开关类型",
+        "Address": "0061",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "熄火信号下降沿消抖延时",
+        "Address": "0062",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "熄火信号上升降沿消抖延时",
+        "Address": "0063",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "熄火信号传感器类型和评判方式",
+        "Address": "0064",
+        "Description": "0=发电机，1=转速,4=发电机不关联启动开关",
+        "Value": "0"
+    },
+	{
+        "Name": "启动信号接入端口号",
+        "Address": "0068",
+        "Description": "信号输入端口取值1--32，0=默认D18",
+        "Value": "0"
+    },
+	{
+        "Name": "启动信号开关类型",
+        "Address": "0069",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "启动信号下降沿消抖延时",
+        "Address": "006A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "启动信号上升降沿消抖延时",
+        "Address": "006B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "启动信号传感器类型",
+        "Address": "006C",
+        "Description": "0=钥匙启动，1=无钥匙启动",
+        "Value": "0"
+    },
+	{
+        "Name": "安全带信号接入端口号",
+        "Address": "0070",
+        "Description": "信号输入端口取值1--32，0=默认D5",
+        "Value": "0"
+    },
+	{
+        "Name": "安全带信号开关类型",
+        "Address": "0071",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "安全带信号下降沿消抖延时",
+        "Address": "0072",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "安全带信号上升降沿消抖延时",
+        "Address": "0073",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "安全带信号传感器类型",
+        "Address": "0074",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "示廓灯信号接入端口号",
+        "Address": "0080",
+        "Description": "信号输入端口取值1--32，0=默认D14",
+        "Value": "0"
+    },
+	{
+        "Name": "示廓灯信号开关类型",
+        "Address": "0081",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "示廓灯信号下降沿消抖延时",
+        "Address": "0082",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "示廓灯信号上升降沿消抖延时",
+        "Address": "0083",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "示廓灯信号传感器类型",
+        "Address": "0084",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "喇叭信号接入端口号",
+        "Address": "0088",
+        "Description": "信号输入端口取值1--32，0=默认D8",
+        "Value": "0"
+    },
+	{
+        "Name": "喇叭信号开关类型",
+        "Address": "0089",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "喇叭信号下降沿消抖延时",
+        "Address": "008A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "喇叭信号上升降沿消抖延时",
+        "Address": "008B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "喇叭信号传感器类型",
+        "Address": "008C",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "车门信号接入端口号",
+        "Address": "0090",
+        "Description": "信号输入端口取值1--32，0=默认D6",
+        "Value": "0"
+    },
+	{
+        "Name": "车门信号开关类型",
+        "Address": "0091",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "车门信号下降沿消抖延时",
+        "Address": "0092",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "车门信号上升降沿消抖延时",
+        "Address": "0093",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "车门信号传感器类型",
+        "Address": "0094",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号_1接入端口号",
+        "Address": "0098",
+        "Description": "信号输入端口取值1--32，0=默认D21",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号_2接入端口号",
+        "Address": "00A0",
+        "Description": "信号输入端口取值1--32，0=默认D22",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号_3接入端口号",
+        "Address": "00A8",
+        "Description": "信号输入端口取值1--32，0=默认D23",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号_4接入端口号",
+        "Address": "00B0",
+        "Description": "信号输入端口取值1--32，0=默认D24",
+        "Value": "0"
+    },
+    {
+        "Name": "挡位传感器信号开关类型",
+        "Address": "0099",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号下降沿消抖延时",
+        "Address": "009A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器信号上升降沿消抖延时",
+        "Address": "009B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "挡位传感器类型",
+        "Address": "009C",
+        "Description": "0=磁感，1=倾角",
+        "Value": "0"
+    },
+	{
+        "Name": "左后视信号接入端口号",
+        "Address": "00B8",
+        "Description": "信号输入端口取值1--32，0=默认D17",
+        "Value": "0"
+    },
+	{
+        "Name": "左后视信号开关类型",
+        "Address": "00B9",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "左后视信号下降沿消抖延时",
+        "Address": "00BA",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "左后视信号上升降沿消抖延时",
+        "Address": "00BB",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "左后视信号传感器类型",
+        "Address": "00BC",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "内后视信号接入端口号",
+        "Address": "00C0",
+        "Description": "信号输入端口取值1--32，0=默认D19",
+        "Value": "0"
+    },
+	{
+        "Name": "内后视信号开关类型",
+        "Address": "00C1",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "内后视信号下降沿消抖延时",
+        "Address": "00C2",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "内后视信号上升降沿消抖延时",
+        "Address": "00C3",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "内后视信号传感器类型",
+        "Address": "00C4",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "副刹信号接入端口号",
+        "Address": "00C8",
+        "Description": "信号输入端口取值1--32，0=默认D29",
+        "Value": "0"
+    },
+	{
+        "Name": "副刹信号开关类型",
+        "Address": "00C9",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "副刹信号下降沿消抖延时",
+        "Address": "00CA",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "副刹信号上升降沿消抖延时",
+        "Address": "00CB",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "副刹信号传感器类型",
+        "Address": "00CC",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "雾灯信号接入端口号",
+        "Address": "00D0",
+        "Description": "信号输入端口取值1--32，0=默认D11",
+        "Value": "0"
+    },
+	{
+        "Name": "雾灯信号开关类型",
+        "Address": "00D1",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "雾灯信号下降沿消抖延时",
+        "Address": "00D2",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "雾灯信号上升降沿消抖延时",
+        "Address": "00D3",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "雾灯信号传感器类型",
+        "Address": "00D4",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号接入端口号",
+        "Address": "00D8",
+        "Description": "信号输入端口取值1--32，0=默认D16",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号开关类型",
+        "Address": "00D9",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号下降沿消抖延时",
+        "Address": "00DA",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号上升降沿消抖延时",
+        "Address": "00DB",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号传感器类型",
+        "Address": "00DC",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "倒车灯信号接入端口号",
+        "Address": "00E0",
+        "Description": "信号输入端口取值1--32，0=默认D7",
+        "Value": "0"
+    },
+	{
+        "Name": "倒车灯信号开关类型",
+        "Address": "00E1",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "倒车灯信号下降沿消抖延时",
+        "Address": "00E2",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "雨刷信号上升降沿消抖延时",
+        "Address": "00E3",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "倒车灯信号传感器类型",
+        "Address": "00E4",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "钥匙门信号接入端口号",
+        "Address": "00E8",
+        "Description": "信号输入端口取值1--32，0=默认D28",
+        "Value": "0"
+    },
+	{
+        "Name": "钥匙门信号开关类型",
+        "Address": "00E9",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "钥匙门信号下降沿消抖延时",
+        "Address": "00EA",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+		{
+        "Name": "钥匙门信号上升降沿消抖延时",
+        "Address": "00EB",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "钥匙门信号传感器类型",
+        "Address": "00EC",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号_1接入端口号",
+        "Address": "00F0",
+        "Description": "信号输入端口取值1--32，0=默认D9",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号_2接入端口号",
+        "Address": "00F8",
+        "Description": "信号输入端口取值1--32，0=默认D10",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号_3接入端口号",
+        "Address": "0100",
+        "Description": "信号输入端口取值1--32，0=默认D31",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号开关类型",
+        "Address": "00F1",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号下降沿消抖延时",
+        "Address": "00F2",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号上升降沿消抖延时",
+        "Address": "00F3",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "绕车信号传感器类型和模式",
+        "Address": "00F4",
+        "Description": "3=贵州科目三，6=天津科目三",
+        "Value": "0"
+    },
+	{
+        "Name": "闯动信号接入端口号",
+        "Address": "0108",
+        "Description": "信号输入端口取值1--32，0=默认D30",
+        "Value": "0"
+    },
+	{
+        "Name": "闯动信号开关类型",
+        "Address": "0109",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "闯动信号下降沿消抖延时",
+        "Address": "010A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "闯动信号上升降沿消抖延时",
+        "Address": "010B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "闯动信号传感器类型",
+        "Address": "010C",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号（压力）接入端口号",
+        "Address": "0110",
+        "Description": "信号输入端口取值1--32，0=默认D25",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅信号（压力）开关类型",
+        "Address": "0111",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅（压力）信号下降沿消抖延时",
+        "Address": "0112",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅（压力）信号上升降沿消抖延时",
+        "Address": "0113",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "座椅（压力）信号传感器类型",
+        "Address": "0114",
+        "Description": "0=关启信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥左前轮信号接入端口号",
+        "Address": "0138",
+        "Description": "信号输入端口取值1--32，0=默认D9",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥左后轮信号接入端口号",
+        "Address": "0139",
+        "Description": "信号输入端口取值1--32，0=默认D10",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥右前轮信号接入端口号",
+        "Address": "013A",
+        "Description": "信号输入端口取值1--32，0=默认D17",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥右后轮信号接入端口号",
+        "Address": "013B",
+        "Description": "信号输入端口取值1--32，0=默认D19",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥左挂轮信号接入端口号",
+        "Address": "013C",
+        "Description": "信号输入端口取值1--32，0=默认D29",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥右挂轮信号接入端口号",
+        "Address": "013D",
+        "Description": "信号输入端口取值1--32，0=默认D32",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥信号开关类型",
+        "Address": "013E",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥信号下降沿消抖延时",
+        "Address": "013F",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥信号上升降沿消抖延时",
+        "Address": "0136",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "单边桥信号传感器类型",
+        "Address": "0137",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "观察仪表盘信号接入端口号",
+        "Address": "0140",
+        "Description": "信号输入端口取值1--35，0=默认D35",
+        "Value": "0"
+    },
+	{
+        "Name": "观察仪表盘信号开关类型",
+        "Address": "0141",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "观察仪表盘信号下降沿消抖延时",
+        "Address": "0142",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "观察仪表盘信号上升沿消抖延时",
+        "Address": "0143",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "观察仪表盘信号传感器类型",
+        "Address": "0144",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车头盔信号接入端口号",
+        "Address": "0148",
+        "Description": "信号输入端口取值1--35，0=默认D5",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车头盔信号开关类型",
+        "Address": "0149",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车头盔信号下降沿消抖延时",
+        "Address": "014A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车头盔信号上升沿消抖延时",
+        "Address": "014B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车头盔信号传感器类型",
+        "Address": "014C",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "摩托车左把手信号接入端口号",
+        "Address": "0150",
+        "Description": "信号输入端口取值1--35，0=默认D17",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左把手信号开关类型",
+        "Address": "0151",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左把手信号下降沿消抖延时",
+        "Address": "0152",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左把手信号上升沿消抖延时",
+        "Address": "0153",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左把手信号传感器类型",
+        "Address": "0154",
+        "Description": "0=默认",
+        "Value": "0"
+    },		
+	{
+        "Name": "摩托车右把手信号接入端口号",
+        "Address": "0158",
+        "Description": "信号输入端口取值1--35，0=默认D19",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右把手信号开关类型",
+        "Address": "0159",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右把手信号下降沿消抖延时",
+        "Address": "015A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右把手信号上升沿消抖延时",
+        "Address": "015B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右把手信号传感器类型",
+        "Address": "015C",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "摩托车左踏板信号接入端口号",
+        "Address": "0160",
+        "Description": "信号输入端口取值1--35，0=默认D6",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左踏板信号开关类型",
+        "Address": "0161",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左踏板信号下降沿消抖延时",
+        "Address": "0162",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左踏板信号上升沿消抖延时",
+        "Address": "0163",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车左踏板信号传感器类型",
+        "Address": "0164",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "摩托车右踏板信号接入端口号",
+        "Address": "0168",
+        "Description": "信号输入端口取值1--35，0=默认D16",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右踏板信号开关类型",
+        "Address": "0169",
+        "Description": "0=常闭，1=常开",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右踏板信号下降沿消抖延时",
+        "Address": "016A",
+        "Description": "关闭信号后，软件保持开启信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右踏板信号上升沿消抖延时",
+        "Address": "016B",
+        "Description": "开启信号后，软件保持关闭信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "摩托车右踏板信号传感器类型",
+        "Address": "016C",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "碰杆接收信号端口号",
+        "Address": "0170",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收信号开关类型",
+        "Address": "0171",
+        "Description": "0=正常，1=碰杆",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收信号下降沿消抖延时",
+        "Address": "0172",
+        "Description": "桩杆归位后，软件保持碰杆信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收信号上升沿消抖延时",
+        "Address": "0173",
+        "Description": "碰撞桩杆后，软件保持未碰杆信号的时间",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收信号信号传感器类型",
+        "Address": "0174",
+        "Description": "0=默认",
+        "Value": "0"
+    },	
+	{
+        "Name": "碰杆接收项目1名称",
+        "Address": "0180",
+        "Description": "01桩考，02限宽门，03牵引车桩考，04连续障碍，05单边桥",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目1编号",
+        "Address": "0181",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目1杆的数量",
+        "Address": "0182",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目1评判方式",
+        "Address": "0183",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目2名称",
+        "Address": "0184",
+        "Description": "01桩考，02限宽门，03牵引车桩考，04连续障碍，05单边桥",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目2编号",
+        "Address": "0185",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目2杆的数量",
+        "Address": "0186",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目2评判方式",
+        "Address": "0187",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+		{
+        "Name": "碰杆接收项目3名称",
+        "Address": "0188",
+        "Description": "01桩考，02限宽门，03牵引车桩考，04连续障碍，05单边桥",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目3编号",
+        "Address": "0189",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目3杆的数量",
+        "Address": "018A",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目3评判方式",
+        "Address": "018B",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目4名称",
+        "Address": "018C",
+        "Description": "01桩考，02限宽门，03牵引车桩考，04连续障碍，05单边桥",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目4编号",
+        "Address": "018D",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目4杆的数量",
+        "Address": "018E",
+        "Description": "01，02，03....",
+        "Value": "0"
+    },
+	{
+        "Name": "碰杆接收项目4评判方式",
+        "Address": "018F",
+        "Description": "0=默认",
+        "Value": "0"
+    },
+	{
+        "Name": "转速怠速最小脉冲计数",
+        "Address": "01D0",
+        "Description": "转速评判熄火使用，为怠速时的最低脉冲数，10倍的输入值",
+        "Value": "0"
+    },
+	{
+        "Name": "转速倍数",
+        "Address": "01D1",
+        "Description": "转速脉冲对应的实际转速倍速",
+        "Value": "0"
+    },
+	{
+        "Name": "转速采样时间",
+        "Address": "01D2",
+        "Description": "转速脉冲采样时间",
+        "Value": "0"
+    },
+	{
+        "Name": "初始状态默认转速",
+        "Address": "01D3",
+        "Description": "10倍的输入值",
+        "Value": "0"
+    },
+	{
+        "Name": "GNSS的板卡型号",
+        "Address": "01D8",
+        "Description": "1=北云基准站;2=合芯基准站;6=北云移动站;7=合芯10Hz移动站",
+        "Value": "0"
+    },
+	
+	
+	
+	
+	
+	{
+        "Name": "自动刹车前方安全距离",
+        "Address": "0300",
+        "Description": "每增加1距离单位增加2CM（刹车主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "自动刹车后方安全距离",
+        "Address": "0301",
+        "Description": "每增加1距离单位增加2CM（刹车主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "雷达模式",
+        "Address": "0302",
+        "Description": "0=串口模式，1=查询模式（刹车主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "自动刹车速度阀值",
+        "Address": "0303",
+        "Description": "km/h（刹车主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "自动刹车出现障碍连续满足次数",
+        "Address": "0304",
+        "Description": "出现障碍连续满足次数（刹车主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯科目",
+        "Address": "03C0",
+        "Description": "2=科目二，3=科目三，4=雨雾天喷水（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯编号（科目二坡道起步）-1",
+        "Address": "03C1",
+        "Description": "科目二坡道起步-1序号（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯编号（科目二坡道起步）-2",
+        "Address": "03C2",
+        "Description": "科目二坡道起步-2序号（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯编号（科目三路口序号）",
+        "Address": "03C3",
+        "Description": "科目三路口红绿灯序号（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "交通信号灯模式",
+        "Address": "03C6",
+        "Description": "0=常开，1=常闭（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红灯灯方向",
+        "Address": "03C7",
+        "Description": "0=东西，1=南北（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯变灯发送次数",
+        "Address": "03C8",
+        "Description": "次数间隔200毫秒（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "采集信号灯",
+        "Address": "03C9",
+        "Description": "0=关闭，1=开始采集（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红绿灯信号复位时间",
+        "Address": "03CA",
+        "Description": "单位--秒（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "雨雾天喷水超时时间",
+        "Address": "03CB",
+        "Description": "单位--秒（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "红灯倒计时时间",
+        "Address": "03CC",
+        "Description": "单位--0.1秒（红绿灯主板）",
+        "Value": "0"
+    },
+	{
+        "Name": "绿灯倒计时时间",
+        "Address": "03CD",
+        "Description": "单位--0.1秒（红绿灯主板）",
+        "Value": "0"
+    }
+]

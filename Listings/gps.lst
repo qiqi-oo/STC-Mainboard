@@ -1,0 +1,344 @@
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GPS
+OBJECT MODULE PLACED IN .\Objects\gps.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE App\gps.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\gps.lst) TABS(2) OBJECT(.\Objects\gps.obj)
+
+line level    source
+
+   1          /*#include <stdio.h>
+   2          #include <string.h>
+   3          #include  "./User/config.h"
+   4          #include  "./User/includes.h"
+   5          
+   6          
+   7          
+   8          
+   9          #ifdef  STC15W4K48S4
+  10          
+  11          xdata u8 GpsRxBuffer[128]=""; //接收缓冲
+  12          
+  13          u8 code CMD_GpsConfFail[] = {0x53,0x5A,0x43,0x47};//Gps配置失败指令
+  14          u8 code CMD_GpsConfSucc[] = {0x44,0x51,0x43,0x47,0x00};//Gps配置成功指令
+  15          
+  16          
+  17          char code  CMD_GpsAckSucc[] = "OK";//Gps配置成功指令
+  18          
+  19          char code  CMD_BY_BaseAuto[] =  "fix auto\r\n";//自动获取基准站坐标
+  20          char code  CMD_BY_GetBasePos[] =  "log refstationa\r\n";//获取基准站坐标
+  21          
+  22          char code  CMD_HX_BaseAuto[] =  "fix auto\r\n";//自动获取基准站坐标
+  23          char code  CMD_HX_GetBasePos[] =  "log bestposa\r\n";//获取基准站坐标
+  24          
+  25          
+  26          char code  CMD_ConfigEnd[] = "Configuration complete\r\n";//配置结束指令，用于程序的循环是�
+             -��结束，与GPS配置无关，必须有！！
+  27          char code  CMD_BY_BaseStation[][CMD_GPS_LENTH] =         //北云GPS基准站指令
+  28          {
+  29            "interfacemode com3 bynav bynav\r\n",//（配置端口的输入类型为bynav）
+  30            "interfacemode com2 rtcm rtcm\r\n",//（配置端口输出类型为rtcm）
+  31            "rtktype base\r\n",// //设置为基准站
+  32            "fix auto\r\n",////自动获取基准站坐标
+  33            "serialconfig com1 38400\r\n",//
+  34            "serialconfig com2 38400\r\n",//
+  35            "serialconfig com3 38400\r\n",//
+  36            "log com2 rtcm1074 ontime 1\r\n",//
+  37            "log com2 rtcm1084 ontime 1\r\n",//
+  38            "log com2 rtcm1114 ontime 1\r\n",//
+  39            "log com2 rtcm1124 ontime 1\r\n",//
+  40            "log com2 rtcm1006 ontime 5\r\n",//
+  41            "log com2 rtcm1033 ontime 10\r\n",//
+  42            "unlogall com3\r\n",//
+  43            "log com3 gpgga ontime 1\r\n",//
+  44            "saveconfig\r\n",             //
+  45            "reboot\r\n",                 // //重启   
+  46            "Configuration complete\r\n"  //配置结束指令，用于程序的循环是否结束，与GPS配置无�
+             -�，必须有！！ 
+  47          };
+  48          
+  49          char code  CMD_BY_MobileStation[][CMD_GPS_LENTH] =         //北云GPS移动站配置指令
+  50          {
+  51            "interfacemode com3 bynav bynav\r\n",//
+  52            "unlogall\r\n",
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 2   
+
+  53            "interfacemode com2 rtcm rtcm\r\n",
+  54            "rtktypertk rover\r\n",
+  55            "interfacemode com3 bynav bynav\r\n",
+  56            "serialconfig com2 38400\r\n",
+  57            "serialconfig com3 38400\r\n",
+  58            "serialconfig com1 38400\r\n",
+  59            "log com3 ptnlpjk ontime 0.1\r\n",
+  60            "log com3 gpvtg ontime 0.1\r\n",
+  61            "log com3 ptnlavr ontime 0.1\r\n",
+  62            "saveconfig\r\n",   
+  63            "Configuration complete\r\n", //配置结束指令，用于程序的循环是否结束，与GPS配置无�
+             -��，必须有！！
+  64          };
+  65          
+  66          char code  CMD_HX_BaseStation[][CMD_GPS_LENTH] =         //合芯GPS基准站指令
+  67          {
+  68            "lmode base time 60 1.5 2.5\r\n",       //将GPS设置为基准站
+  69            "fix auto\r\n",                     //自动获取基准站坐标
+  70            "unlog com3\r\n",               
+  71            "log com2 rtcm1033 ontime 10\r\n",                  
+  72            "log com2 rtcm1006 ontime 10\r\n",//
+  73            "log com2 rtcm1074 ontime 1\r\n",//
+  74            "log com2 rtcm1084 ontime 1\r\n",//
+  75            "log com2 rtcm1124 ontime 1\r\n",//
+  76            "log com2 rtcm1094 ontime 1\r\n",//
+  77            "config com2 38400\r\n",//
+  78            "config com3 38400\r\n",//
+  79            "saveconfig\r\n",//   
+  80            "Configuration complete\r\n"  //配置结束指令，用于程序的循环是否结束，与GPS配置无�
+             -�，必须有！！
+  81          };
+  82          
+  83          
+  84          char code  CMD_HX10Hz_MobileStation[][CMD_GPS_LENTH] =         //合芯GPS移动站指令
+  85          {
+  86            "log headinga ontime 1\r\n",        //将GPS设置为基准站
+  87            "com com2 38400\r\n",                     //自动获取基准站坐标
+  88            "com com3 38400\r\n",               
+  89            "Unlogall com2\r\n",                  
+  90            "Unlogall com3\r\n",//
+  91            "log com3 gpntr ontime 0.1\r\n",//
+  92            "log com3 gptra onchanged\r\n",//
+  93            "log com3 gpvtg ontime 0.1\r\n",//
+  94            "log com3 gprmc ontime 0.1\r\n",//
+  95            "Headingmode variablelength \r\n",//
+  96            "mode rover\r\n",//
+  97            "saveconfig\r\n",//   
+  98            "Configuration complete\r\n"  //配置结束指令，用于程序的循环是否结束，与GPS配置无�
+             -�，必须有！！ 
+  99          };
+ 100          
+ 101          char code  CMD_HX5Hz_MobileStation[][CMD_GPS_LENTH] =         //合芯GPS移动站指令
+ 102          {
+ 103            "log headinga ontime 1\r\n",        //将GPS设置为基准站
+ 104            "com com2 38400\r\n",                     //自动获取基准站坐标
+ 105            "com com3 38400\r\n",               
+ 106            "Unlogall com2\r\n",                  
+ 107            "Unlogall com3\r\n",//
+ 108            "log com3 gpntr ontime 0.2\r\n",//
+ 109            "log com3 gptra onchanged\r\n",//
+ 110            "log com3 gpvtg ontime 0.2\r\n",//
+ 111            "log com3 gprmc ontime 0.2\r\n",//
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 3   
+
+ 112            "Headingmode variablelength \r\n",//
+ 113            "mode rover\r\n",//
+ 114            "saveconfig\r\n",//   
+ 115            "Configuration complete\r\n"  //配置结束指令，用于程序的循环是否结束，与GPS配置无�
+             -�，必须有！！ 
+ 116          };
+ 117          //========================================================================
+ 118          // 函数: u8 GPS_Configuration(u8 USARTx,char *dat)
+ 119          // 描述: 配置gps，给gps发送指令，同时可根据指令返回差分站坐标
+ 120           //      连续尝试3次，不成功即配置失败
+ 121          // 参数：u8 USARTx,配置串口，char *cmd 指向指令的地址
+ 122          // 返回: 无
+ 123          // 版本: V1.0, 2022-10-17
+ 124          //========================================================================
+ 125          static u8 Configuration(u8 USARTx,char *cmd)  //配置GPS板卡
+ 126          {
+ 127            xdata u8 i=0;
+ 128            xdata u8 times=3;
+ 129            
+ 130            //printf("GPS_Configuration\r\n");
+ 131            
+ 132            while (times--)
+ 133            {
+ 134              
+ 135              if (strcmp(cmd,CMD_HX_BaseAuto) == 0)  //fix auto\r\n与北云通用
+ 136              {
+ 137                delay_ms(3000); //延时3秒后，获取差分站的定位坐标
+ 138              }
+ 139              
+ 140              BSP_ClearUsartRxBuffer(USARTx);//清串口缓存
+ 141              
+ 142              USART_Sendbuffer(USARTx,cmd,strlen(cmd));//发送配置指令
+ 143              
+ 144              delay_ms(300);//延时350读取板卡回复
+ 145              
+ 146              memset(GpsRxBuffer, 0, sizeof(GpsRxBuffer));//清缓存数据
+ 147              
+ 148              BSP_GetUsartRxBuffer(USARTx,GpsRxBuffer,sizeof(GpsRxBuffer));//读取串口数据
+ 149                    
+ 150              if(strstr((char *)GpsRxBuffer,CMD_GpsAckSucc) != NULL)  //Gps配置成功指令应答成功OK
+ 151              {
+ 152                if (strstr(cmd,"com3 38400") != NULL) //改变串口波特率指令serialconfig com3 38400\r\n
+ 153                {
+ 154                  BSP_Usart_Init(USARTx,38400); //波特率和GPS串口波特率同步
+ 155                  S1_USE_P16P17();//STC切换串口1到GPS串口
+ 156                }
+ 157                return(1);//收到GPS正确的回复
+ 158              }
+ 159            }
+ 160            return(0);//未收到GPS正确的回复
+ 161          }
+ 162          //========================================================================
+ 163          // 函数: void GPS_EnterConfig(u8 USARTx, char **pcmd) //配置GPS
+ 164          // 描述: 按照指令集合pcmd的指令配置GPS移动站，指令集合中最后一条指令必须是C
+             -MD_ConfigEnd
+ 165          // 参数：u8 USARTx,配置串口,char (*pcmd)[CMD_GPS_LENTH]指向指令集合的指针
+ 166          // 返回: 无
+ 167          // 版本: V1.0, 2022-10-17
+ 168          //========================================================================
+ 169          static void EnterConfig(u8 USARTx, char (*pcmd)[CMD_GPS_LENTH]) 
+ 170          {
+ 171            xdata u8 Index = 0;//指令序号
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 4   
+
+ 172            xdata u8 temp = 0;//
+ 173              
+ 174            S1_Int_on();//开串口1中断
+ 175            
+ 176            BSP_Usart_Init(USARTx,115200);//测试波特率
+ 177            S1_USE_P16P17();//STC切换串口1到GPS串口
+ 178            
+ 179            if(Configuration(USARTx,pcmd[Index]) == 0)//配置失败
+ 180            {
+ 181               BSP_Usart_Init(USARTx,38400);//测试波特率
+ 182               S1_USE_P16P17();//STC切换串口1到GPS串口
+ 183            }
+ 184            if(Configuration(USARTx,pcmd[Index]) == 0)//配置失败
+ 185            {
+ 186               BSP_Usart_Init(USARTx,19200);//测试波特率
+ 187                S1_USE_P16P17();//STC切换串口1到GPS串口
+ 188            }
+ 189            if(Configuration(USARTx,pcmd[Index]) == 1)//波特率适配成功 
+ 190            {
+ 191              while(strstr(pcmd[Index],CMD_ConfigEnd) == NULL)//查询到配置完成指令，跳出循环，配置结
+             -束
+ 192              {
+ 193                
+ 194                //printf("Index = %b02d\r\n",Index);
+ 195                
+ 196                temp = Configuration(USARTx,pcmd[Index]);//发送配置指令
+ 197                  
+ 198                if (temp == 0)//配置失败
+ 199                {
+ 200                  USART_Sendbuffer(UPLOAD_USART,CMD_GpsConfFail,sizeof(CMD_GpsConfFail));//发送配置失败指令
+ 201                  
+ 202                  USART_SendData(UPLOAD_USART,Index);//发送错指令索引
+ 203                  
+ 204                  //printf("GpsConfFail :Index = %b02d\r\n",Index);
+ 205                  
+ 206                  return;//配置失败
+ 207                }
+ 208                
+ 209                Index ++;//移到下一个指令
+ 210                      
+ 211              }
+ 212            }
+ 213            USART_Sendbuffer(USARTx,CMD_GpsConfSucc,sizeof(CMD_GpsConfSucc));//应答配置成功
+ 214            
+ 215            //printf("GpsConfSucc\r\n",Index);      
+ 216          } 
+ 217          //========================================================================
+ 218          // 函数: void GetBaseStationPos(void) 
+ 219          // 描述: 得到GPS基准站坐标，上传给上位机
+ 220          // 参数：无
+ 221          // 返回: 无
+ 222          // 版本: V1.0, 2022-10-17
+ 223          //========================================================================
+ 224          void GetBaseStationPos(void)  
+ 225          {
+ 226            xdata u8 i = 0 ;  //
+ 227            xdata u8 type = 0 ;//获取配置文件，得到gps类型
+ 228            BSP_ClearUsartRxBuffer(GPS_USART);//清串口缓存
+ 229            switch(type)
+ 230            {
+ 231              case BY_BASESTATION:
+ 232                        USART_Sendbuffer(GPS_USART,CMD_BY_GetBasePos,strlen(CMD_BY_GetBasePos));//发送获取北云gps基�
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 5   
+
+             -��站坐标的指令  
+ 233              case HX_BASESTATION:
+ 234                        USART_Sendbuffer(GPS_USART,CMD_BY_GetBasePos,strlen(CMD_BY_GetBasePos));//发送获取合芯gps基�
+             -��站坐标的指令      
+ 235              default:
+ 236                      break;
+ 237                              
+ 238            } 
+ 239            delay_ms(300);
+ 240            
+ 241            memset(GpsRxBuffer, 0, sizeof(GpsRxBuffer));//清缓存数据
+ 242              
+ 243            BSP_GetUsartRxBuffer(GPS_USART,GpsRxBuffer,sizeof(GpsRxBuffer));//读取串口数据
+ 244              
+ 245            for(i=0;i<strlen((char *)GpsRxBuffer);i++)
+ 246            {   
+ 247              USART_SendData(UPLOAD_USART,GpsRxBuffer[i]);//回复基准站坐标
+ 248            }  
+ 249            BSP_ClearUsartRxBuffer(GPS_USART);//清串口缓存                     
+ 250          }
+ 251          
+ 252          
+ 253          
+ 254          //========================================================================
+ 255          // 函数: void GPS_EnterConfiguration(void)  
+ 256          // 描述: 进入GPS配置模式
+ 257          // 参数：mode是指定差分站还是移动站，由上位机决定
+ 258          // 返回: 无
+ 259          // 版本: V1.0, 2022-10-17
+ 260          //========================================================================
+ 261          void GPS_EnterConfiguration(u8 mode)  
+ 262          {
+ 263            
+ 264            if  (mode ==BASESTATION )
+ 265            {
+ 266                switch(GNSS_MODEL)
+ 267                {
+ 268                  case BY_BASESTATION:
+ 269                                      EnterConfig(GPS_USART,CMD_BY_BaseStation);//进入北云GPS基准站配置
+ 270                                      break;
+ 271                  case HX_BASESTATION:
+ 272                                      EnterConfig(GPS_USART,CMD_HX_BaseStation);//进入合芯GPS基准站配置
+ 273                                      break;    
+ 274                  default:
+ 275                          break;
+ 276                }
+ 277                              
+ 278            } 
+ 279            if  (mode == MOBILESTATION)
+ 280            {
+ 281                switch(GNSS_MODEL)
+ 282                {
+ 283                  case BY_MOBILESTATION:
+ 284                                      EnterConfig(GPS_USART,CMD_BY_MobileStation);      //进入北云GPS移动站配置
+ 285                                      break;
+ 286                  case HX10HZ_MOBILESTATION:
+ 287                                      EnterConfig(GPS_USART,CMD_HX10Hz_MobileStation);  //进入合芯10HzGPS移动站配置
+ 288                                      break;    
+ 289                  case HX5HZ_MOBILESTATION:
+ 290                                      EnterConfig(GPS_USART,CMD_HX5Hz_MobileStation);   //进入合芯5HzGPS移动站配置
+ 291                                      break;  
+ 292                  default:
+C51 COMPILER V9.60.0.0   GPS                                                               09/20/2025 15:17:36 PAGE 6   
+
+ 293                          break;
+ 294                }   
+ 295            }
+ 296              
+ 297                            
+ 298          }
+ 299          #endif
+ 300          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

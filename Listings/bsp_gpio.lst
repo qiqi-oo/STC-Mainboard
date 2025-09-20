@@ -1,0 +1,482 @@
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP_GPIO
+OBJECT MODULE PLACED IN .\Objects\bsp_gpio.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Bsp\bsp_gpio.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.
+                    -\Listings\bsp_gpio.lst) TABS(2) OBJECT(.\Objects\bsp_gpio.obj)
+
+line level    source
+
+   1          
+   2          #include  "./User/includes.h"
+   3          #include  <stdio.h>
+   4          #include  <string.h>
+   5          
+   6          #ifdef  STC15W4K48S4  
+              xdata PengGanSignalTypeDef  pgxd[4];//碰杆消抖
+              #endif
+   9          //========================================================================
+  10          // 函数: void BSP_GPIO_Init(void)
+  11          // 描述: 初始化主板IO口.全部初始化为：上拉准双向口
+  12          // 版本: V1.0, 2022-10-17
+  13          //========================================================================
+  14          void BSP_GPIO_Init(void)
+  15          {
+  16   1        GPIO_InitTypeDef  GPIO_InitStructure;       //结构定义
+  17   1        
+  18   1        GPIO_InitStructure.Pin  = GPIO_Pin_All;     //指定要初始化的IO, GPIO_Pin_0 ~ GPIO_Pin_7, 或操作
+  19   1        GPIO_InitStructure.Mode = GPIO_PullUp;      //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_O
+             -UT_OD,GPIO_OUT_PP
+  20   1        
+  21   1        GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);  //初始化GPIO_P0
+  22   1        GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);  //初始化GPIO_P1
+  23   1        GPIO_Inilize(GPIO_P2,&GPIO_InitStructure);  //初始化GPIO_P2
+  24   1        GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);  //初始化GPIO_P3
+  25   1        GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);  //初始化GPIO_P4
+  26   1        
+  27   1      }
+  28          //========================================================================
+  29          // 函数: void BSP_Zhuansu_Init(void)
+  30          // 描述: 初始化定时器0为计数模式，对转速脉冲计数
+  31          // 版本: V1.0, 2022-10-17
+  32          //========================================================================
+  33          void BSP_ZhuansuCount_Init(void)
+  34          {
+  35   1          TMOD |= 0x05; //设置定时器0为计数器模式//对转速脉冲计数
+  36   1          TH0=0;        //计数器清零
+  37   1          TL0=0;        //计数器清零
+  38   1          TR0=1;        //计数器0开始计数
+  39   1      }
+  40          //========================================================================
+  41          // 函数: void BSP_LichengCount_Init(void)
+  42          // 描述: 初始化定时器为计数模式，对转速脉冲计数
+  43          // 版本: V1.0, 2023-5-25
+  44          //========================================================================
+  45          void BSP_LichengCount_Init(void)
+  46          {
+  47   1      
+  48   1          switch(pFlash->lc.pin)
+  49   1          {
+  50   2            case  LC_T0:                
+  51   2                          TMOD |= 0x05; //设置定时器0为计数器模式
+  52   2                          TH0=0;        //计数器清零
+  53   2                          TL0=0;        //计数器清零
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 2   
+
+  54   2                          TR0=1;        //计数器0开始计数
+  55   2                          break;
+  56   2            case  LC_T1:                
+  57   2                          TMOD |= 0x50; //使用计数器T1为计数器模式
+  58   2                          TH1=0;        //计数器清零
+  59   2                          TL1=0;        //计数器清零
+  60   2                          TR1=1;        //计数器1开始计数
+  61   2                          break;
+  62   2          
+  63   2      #ifdef  STC15W4K48S4
+                    case  LC_T2:                //使用计数器T2
+                                  AUXR |= 0x08; //使用计数器T2为计数器模式
+                                  T2H=0;        //计数器清零
+                                  T2L=0;        //计数器清零
+                                  AUXR |= 0x10; //计数器2开始计数
+                                  break;
+                    case  LC_T3:                //使用计数器T3
+                                  T4T3M |=0x04;//使用计数器T3为计数器模式
+                                  T3H=0;        //计数器清零
+                                  T3L=0;        //计数器清零
+                                  AUXR |= 0x08; //计数器3开始计数
+                                  break;
+                    case  LC_T4:                //使用计数器T4
+                                  T4T3M |=0x40; //使用计数器T3为计数器模式
+                                  T4H=0;        //计数器清零
+                                  T4L=0;        //计数器清零
+                                  AUXR |= 0x80; //计数器4开始计数
+                                  break;
+              #endif
+  83   2            default:
+  84   2            
+  85   2                return;       
+  86   2         }  
+  87   1        
+  88   1        
+  89   1        
+  90   1        
+  91   1        
+  92   1      }
+  93          //========================================================================
+  94          // 函数: u8 BSP_GetGpioStatus(u8 pin)
+  95          // 描述: 读取输入管脚电平值.此函数与硬件电路相关联
+  96          // 参数: 板载输入口编号，取值D1--D32.
+  97          // 返回: 输入口电平值.0或者1
+  98          // 版本: V1.0, 2022-10-17
+  99          //========================================================================
+ 100          u8 BSP_GetGpioStatus(u8 pin)//查询对应的IO口状态
+ 101          {
+ 102   1        switch(pin)
+ 103   1        {
+ 104   2      #ifdef  STC12C5A60S2  
+ 105   2          case D1:    return(P00);
+ 106   2          case D2:    return(P01);
+ 107   2          case D3:    return(P02);
+ 108   2          case D4:    return(P03);
+ 109   2          case D5:    return(P04);
+ 110   2          case D6:    return(P05);
+ 111   2          case D7:    return(P06);
+ 112   2          case D8:    return(P07);
+ 113   2          case D9:    return(P27);
+ 114   2          case D10:   return(P26);
+ 115   2          case D11:   return(P25);
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 3   
+
+ 116   2          case D12:   return(P24);
+ 117   2          case D13:   return(P23);
+ 118   2          case D14:   return(P22);
+ 119   2          case D15:   return(P21);
+ 120   2          case D16:   return(P20);
+ 121   2          case D17:   return(P10);
+ 122   2          case D18:   return(P11);
+ 123   2          case D19:   return(P12);
+ 124   2          case D20:   return(P13);
+ 125   2          case D21:   return(P14);
+ 126   2          case D22:   return(P15);
+ 127   2          case D23:   return(P16);
+ 128   2          case D24:   return(P17);
+ 129   2          case D25:   return(P32);
+ 130   2          case D26:   return(P33);
+ 131   2          case D27:   return(P34);
+ 132   2          case D28:   return(P35);
+ 133   2          case D29:   return(P36);
+ 134   2          case D30:   return(P37); 
+ 135   2          case D31:   return(P47);
+ 136   2          case D32:   return(P46);
+ 137   2          case D33:   return(P45);
+ 138   2          case D34:   return(P44); 
+ 139   2          case D35:   return(P44);
+ 140   2      #endif
+ 141   2      #ifdef  STC15W4K48S4  
+                  case D1:    return(P45);
+                  case D2:    return(P27);
+                  case D3:    return(P02);
+                  case D4:    return(P26);
+                  case D5:    return(P03);
+                  case D6:    return(P25);
+                  case D7:    return(P04);
+                  case D8:    return(P24);
+                  case D9:    return(P05);
+                  case D10:   return(P23);
+                  case D11:   return(P06);
+                  case D12:   return(P22);
+                  case D13:   return(P07);
+                  case D14:   return(P21);
+                  case D15:   return(P20);
+                  case D16:   return(P44);
+                  case D17:   return(P12);
+                  case D18:   return(P42);
+                  case D19:   return(P13);
+                  case D20:   return(P41);
+                  case D21:   return(P14);
+                  case D22:   return(P37);
+                  case D23:   return(P15);
+                  case D24:   return(P36);
+                  case D25:   return(P35);
+                  case D26:   return(P34);
+                  case D27:   return(P33);
+                  case D28:   return(P32);
+                  case D29:   return(P54);
+                  case D30:   return(P55); 
+                  case D31:   return(P55);
+                  case D32:   return(P55);
+              #endif
+ 175   2      
+ 176   2          default: 
+ 177   2                      return(1);//返回1就是没有信号
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 4   
+
+ 178   2        }
+ 179   1      }
+ 180          //========================================================================
+ 181          // 函数: u8 BSP_ReadInputDataBit(SignalTypeDef *pSignal)
+ 182          // 描述: 读取输入管脚电平值.
+ 183          // 参数: SignalTypeDef为指向信号结构体的指针.
+ 184          // 返回: 返回TURE，或FALSE.
+ 185          // 版本: V1.0, 2022-10-17
+ 186          //========================================================================
+ 187          u8 BSP_ReadInputDataBit(SignalTypeDef *pSignal)
+ 188          {
+ 189   1        xdata u8 status = 0;
+ 190   1        xdata u8 signalstatus = BSP_GetGpioStatus(pSignal->pin);//获取单片机的管脚输入状态
+ 191   1        
+ 192   1        if(pSignal->pin >= 64) //如果管脚数值超过64，直接返回0
+ 193   1        {
+ 194   2            return FALSE;
+ 195   2        }
+ 196   1        if(pSignal->falling_ed == 255)  pSignal->falling_ed = 0;//此处仅为兼容老版本的程序，未增�
+             -�该参数的情况
+ 197   1      
+ 198   1        if(pSignal->stateflag == 0)
+ 199   1        {
+ 200   2          if (signalstatus == pSignal->modle)//判断信号是否开启
+ 201   2          {
+ 202   3            pSignal->times = 0;
+ 203   3            status = TURE;  
+ 204   3          }
+ 205   2          else if(pSignal->times < pSignal->rising_ed) //信号抖动与延时处理
+ 206   2          {
+ 207   3            (pSignal->times)++;
+ 208   3            status = TURE;  
+ 209   3          } 
+ 210   2          else 
+ 211   2          {
+ 212   3            pSignal->stateflag = 1;
+ 213   3            status = FALSE; 
+ 214   3          }
+ 215   2        }
+ 216   1        else 
+ 217   1        {
+ 218   2          if (signalstatus != pSignal->modle)//获取相应的状态
+ 219   2          {
+ 220   3            pSignal->times = 0;
+ 221   3            status = FALSE;
+ 222   3          }
+ 223   2          else if(pSignal->times < pSignal->falling_ed) //信号抖动与延时处理
+ 224   2          {
+ 225   3            (pSignal->times)++;
+ 226   3            status = FALSE;
+ 227   3          } 
+ 228   2          else 
+ 229   2          {
+ 230   3            pSignal->stateflag = 0;
+ 231   3            status = TURE; 
+ 232   3          }   
+ 233   2        }
+ 234   1        #ifdef DEBUG1
+                if(pSignal->pin ==12)
+                {
+                        printf("pin = %b02u  modle  = %b02u  times = %b02u rising_ed = %b02u falling_ed = %b02u\r\n"\
+                              ,pSignal->pin,pSignal->modle,pSignal->times,pSignal->rising_ed,pSignal->falling_ed);
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 5   
+
+                        printf("gpiovalue = %b02d.  ",signalstatus);
+                        printf("output = %b02d.\r\n",status);
+                }
+                #endif  
+ 243   1        return(status);
+ 244   1      }
+ 245          //========================================================================
+ 246          // 函数:BSP_ReadMultipleDataBit(MultSignalTypeDef *pSignal,u8 offset)
+ 247          // 描述: 读取一个传感器多个信号线
+ 248          // 参数: MultSignalTypeDef指向地址，pin读的是哪一根信号线.
+ 249          // 返回: 返回TURE，或FALSE.
+ 250          // 版本: V1.0, 2022-10-17
+ 251          //========================================================================
+ 252          u8 BSP_ReadMultipleDataBit(MultSignalTypeDef *pSignal,u8 offset)
+ 253          {
+ 254   1          
+ 255   1        xdata u8 pin = *(u8 *)((u8 *)pSignal + offset  - 1);
+ 256   1        xdata u8 status = 0;
+ 257   1        xdata u8 signalstatus = BSP_GetGpioStatus(pin);//获取单片机的管脚输入状态
+ 258   1        xdata u8 flag = 0;//信号反转标志
+ 259   1        
+ 260   1        if(pin >= 64) //如果管脚数值超过64，直接返回0
+ 261   1        {
+ 262   2            return FALSE;
+ 263   2        }
+ 264   1        flag = (((pSignal->stateflag) >> (offset-1)) & (0x01));//得到标志状态
+ 265   1        
+ 266   1        pSignal->times = pSignal->counts[offset-1];//获取延时计数器的值
+ 267   1        
+ 268   1        if(pSignal->falling_ed == 255)  pSignal->falling_ed = 0;//此处仅为兼容老版本的程序，未增�
+             -�该参数的情况
+ 269   1          
+ 270   1        if(flag == 0)
+ 271   1        {
+ 272   2          if (signalstatus == pSignal->modle)//判断信号是否开启
+ 273   2          {
+ 274   3            pSignal->times = 0;
+ 275   3            status = TURE;
+ 276   3          }
+ 277   2          else if(pSignal->times < pSignal->rising_ed) //信号抖动与延时处理
+ 278   2          {
+ 279   3            pSignal->times++;
+ 280   3            status = TURE;
+ 281   3          } 
+ 282   2          else 
+ 283   2          {
+ 284   3            flag = 1;
+ 285   3            status = FALSE; 
+ 286   3          }
+ 287   2        }
+ 288   1        else 
+ 289   1        {
+ 290   2          if (signalstatus != pSignal->modle)//获取相应的状态
+ 291   2          {
+ 292   3            pSignal->times = 0;
+ 293   3            status = FALSE;
+ 294   3          }
+ 295   2          else if(pSignal->times < pSignal->falling_ed) //信号抖动与延时处理
+ 296   2          {
+ 297   3            pSignal->times++;
+ 298   3            status = FALSE;
+ 299   3          } 
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 6   
+
+ 300   2          else 
+ 301   2          {
+ 302   3            flag = 0;
+ 303   3            status = TURE; 
+ 304   3          }   
+ 305   2        }
+ 306   1        pSignal->counts[offset-1]=pSignal->times;//保存本次延时计数器的值
+ 307   1        
+ 308   1        pSignal->stateflag |= (flag << offset-1);
+ 309   1          
+ 310   1        return(status);
+ 311   1        
+ 312   1      }
+ 313          
+ 314          
+ 315          ////========================================================================
+ 316          //// 函数:BSP_MultipdelayOutput(MultSignalTypeDef *pSignal,u8 value)
+ 317          //// 描述: 多路信号的延时输出
+ 318          //// 参数: MultSignalTypeDef指向地址，value当前的值.
+ 319          //// 返回: 返回TURE，或FALSE.
+ 320          //// 版本: V1.0, 2023-8-31
+ 321          ////========================================================================
+ 322          //u8 BSP_delayOutput(u8 *times, u8 *counts, u8 *value)
+ 323          //{
+ 324          //  static  u8 state = 0;
+ 325          //  static  u8 times = 0;
+ 326          //  
+ 327          //  if(state != value) //值发生变化
+ 328          //  {
+ 329          //    
+ 330          //    if(times <  counts) //使用上升沿的延时参数
+ 331          //    {
+ 332          //      times++;
+ 333          //      
+ 334          //    }
+ 335          //    else 
+ 336          //    {
+ 337          //      times = 0;
+ 338          //      
+ 339          //      state = value;
+ 340          //      
+ 341          //    }
+ 342          //          
+ 343          //  }
+ 344          //  else 
+ 345          //  {
+ 346          //     times = 0;
+ 347          //  }
+ 348          //  
+ 349          //    printf("times = %b02u state = %b02u\r\n",times,state);
+ 350          //  
+ 351          //  return state;
+ 352          //  
+ 353          //  
+ 354          //}
+ 355          #ifdef  STC15W4K48S4  
+              //========================================================================
+              // 函数:BSP_ReadBumpDataBit(SignalTypeDef *pSignal,u8 group,u8 valuebit,u8 offset)
+              // 描述: 碰杆传感器消抖
+              // 参数: MultSignalTypeDef指向地址，u8 碰杆状态的value值 offset读的是哪一根信号线（
+             -从0开始）.
+              // 返回: 返回TURE，或FALSE.
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 7   
+
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              u8 BSP_ReadBumpDataBit(SignalTypeDef *pSignal,u8 group,u8 valuebit,u8 offset)
+              {
+                xdata u8 status = 0;
+                xdata u8 signalstatus = valuebit;//获取输入状态
+                
+                xdata u8 flag = 0;//信号反转标志
+                
+                flag = (((pgxd[group].stateflag) >> offset) & (0x01));//得到标志状态
+                
+                pSignal->times = pgxd[group].times[offset];//获取延时计数器的值
+                
+                if(pSignal->falling_ed == 255)  pSignal->falling_ed = 0;//此处仅为兼容老版本的程序，未增�
+             -�该参数的情况
+                  
+                if(flag == 0)
+                {
+                  if (signalstatus == TURE)//判断信号是否开启
+                  {
+                    pSignal->times = 0;
+                    status = TURE;
+                  }
+                  else if(pSignal->times < pSignal->rising_ed) //信号抖动与延时处理
+                  {
+                    pSignal->times++;
+                    status = TURE;
+                  } 
+                  else 
+                  {
+                    flag = 1;
+                    status = FALSE; 
+                  }
+                }
+                else 
+                {
+                  if (signalstatus != TURE)//获取相应的状态
+                  {
+                    pSignal->times = 0;
+                    status = FALSE;
+                  }
+                  else if(pSignal->times < pSignal->falling_ed) //信号抖动与延时处理
+                  {
+                    pSignal->times++;
+                    status = FALSE;
+                  } 
+                  else 
+                  {
+                    flag = 0;
+                    status = TURE; 
+                  }   
+                }
+                #ifdef DEBUG1
+                  if(pin == 13)
+                  {
+                  printf("pin = %b02u  modle  = %b02u  times = %b02u rising_ed = %b02u falling_ed = %b02u\r\n"\
+                              ,pin,pSignal->modle,pSignal->times,pSignal->rising_ed,pSignal->falling_ed);
+                  printf("gpiovalue = %b02d.  ",signalstatus);
+                  printf("output = %b02d.\r\n",status);
+                  }
+                
+                #endif  
+C51 COMPILER V9.60.0.0   BSP_GPIO                                                          09/20/2025 15:17:34 PAGE 8   
+
+                  
+                pgxd[group].times[offset] = pSignal->times;//保存本次延时计数器的值
+                
+                if( flag == 0 )
+                {
+                  pgxd[group].stateflag &= ~(u16)(1<< offset);//更新消抖处理结果
+                }
+                else 
+                  pgxd[group].stateflag |= (u16)(1<< offset);//更新消抖处理结果
+                
+                return(status);
+              }
+              #endif
+ 435          
+ 436          
+ 437          
+ 438          
+ 439          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    952    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

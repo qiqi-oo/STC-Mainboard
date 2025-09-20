@@ -1,0 +1,446 @@
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP_USART
+OBJECT MODULE PLACED IN .\Objects\bsp_usart.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Bsp\bsp_usart.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\bsp_usart.lst) TABS(2) OBJECT(.\Objects\bsp_usart.obj)
+
+line level    source
+
+   1          #include "./User/includes.h"
+   2          #include <stdio.h>
+   3          #include <string.h>
+   4          
+   5          
+   6            
+   7          #ifdef  STC12C5A60S2  
+   8            xdata UsartRxTypeDef Rx[2]; 
+   9            xdata u8 Rx1_Buffer[COM_Rx_LENTH];
+  10            xdata u8 Rx2_Buffer[COM_Rx_LENTH];
+  11          #endif
+  12          
+  13          
+  14          #ifdef  STC15W4K48S4  
+                xdata UsartRxTypeDef Rx[4]; 
+                xdata u8 Rx1_Buffer[GPS_Rx_LENTH];
+                xdata u8 Rx2_Buffer[COM_Rx_LENTH];
+                xdata u8 Rx3_Buffer[COM_Rx_LENTH];
+                xdata u8 Rx4_Buffer[COM_Rx_LENTH];
+                  
+              #endif
+  22          //========================================================================
+  23          // 函数:char putchar(char ch) printf重定向函数
+  24          // 描述:printf重定向到usart1
+  25          // 参数：
+  26          // 版本: 
+  27          //========================================================================
+  28          char putchar(char ch)  //函数默认的，在使用printf函数时自动调用
+  29          {
+  30   1        #ifdef  STC15W4K48S4
+                  USART_SendData(NETWORK_USART,(char)ch);
+                #endif
+  33   1        
+  34   1        #ifdef  STC12C5A60S2  
+  35   1          USART_SendData(CONSOLE_USART,(char)ch);
+  36   1        #endif
+  37   1        return ch;
+  38   1      }
+  39          //========================================================================
+  40          // 函数:BSP_Usart_Init(unsigned char USARTx,unsigned long bote)
+  41          // 描述: 初始化串口
+  42          // 参数：USARTx端口号，bote波特率
+  43          // 版本: V1.0, 2022-10-17
+  44          //========================================================================
+  45          void BSP_Usart_Init(unsigned char USARTx,unsigned long bote)
+  46          {
+  47   1        COMx_InitDefine   COMx_InitStructure;                 //结构定义
+  48   1        
+  49   1        if(USARTx == USART1)
+  50   1        { 
+  51   2          Rx[USARTx-1].pStart = Rx1_Buffer;
+  52   2          Rx[USARTx-1].pEnd  = (u8 *)(Rx1_Buffer + sizeof(Rx1_Buffer) -1);
+  53   2          Rx[USARTx-1].pIn   = Rx[USARTx-1].pStart;
+  54   2          Rx[USARTx-1].overflow_flag = 0;
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 2   
+
+  55   2          memset(Rx1_Buffer,0,sizeof(Rx1_Buffer));
+  56   2          
+  57   2          COMx_InitStructure.UART_BRT_Use   = BRT_Timer1;       //使用波特率发生器,   BRT_Timer1, BRT_Timer2
+             - 
+  58   2        }
+  59   1        else if(USARTx == USART2)
+  60   1        {
+  61   2          Rx[USARTx-1].pStart = Rx2_Buffer;
+  62   2          Rx[USARTx-1].pEnd  = Rx2_Buffer + sizeof(Rx2_Buffer) -1;
+  63   2          Rx[USARTx-1].pIn   = Rx[USARTx-1].pStart;
+  64   2          Rx[USARTx-1].overflow_flag = 0;
+  65   2          memset(Rx2_Buffer,0,sizeof(Rx2_Buffer));
+  66   2          
+  67   2          COMx_InitStructure.UART_BRT_Use   = BRT_Timer2;       //使用波特率发生器,   BRT_Timer2 (注意: �
+             -�口2固定使用BRT_Timer2)
+  68   2        }
+  69   1      #ifdef  STC15W4K48S4  
+                else if(USARTx == USART3)
+                {
+                  Rx[USARTx-1].pStart = Rx3_Buffer;
+                  Rx[USARTx-1].pEnd  = Rx3_Buffer + sizeof(Rx3_Buffer) -1;
+                  Rx[USARTx-1].pIn   = Rx[USARTx-1].pStart;
+                  Rx[USARTx-1].overflow_flag = 0;
+                  memset(Rx3_Buffer,0,sizeof(Rx3_Buffer));
+                  
+                  COMx_InitStructure.UART_BRT_Use   = BRT_Timer3;       //使用波特率发生器,   BRT_Timer2, BRT_Timer3
+             - 
+                }
+                else if(USARTx == USART4)
+                {
+                  Rx[USARTx-1].pStart = Rx4_Buffer;
+                  Rx[USARTx-1].pEnd  = Rx4_Buffer + sizeof(Rx4_Buffer) -1;
+                  Rx[USARTx-1].pIn   = Rx[USARTx-1].pStart;
+                  Rx[USARTx-1].overflow_flag = 0;
+                  memset(Rx4_Buffer,0,sizeof(Rx4_Buffer));
+                  
+                  COMx_InitStructure.UART_BRT_Use   = BRT_Timer4;       //使用波特率发生器,   BRT_Timer2, BRT_Timer4
+             - 
+                }
+              #endif
+  91   1        else 
+  92   1        {
+  93   2          return;
+  94   2        }
+  95   1        if(bote == DISABLE)  return;                          //检查波特率，为DISABLE时，不初始化该串口
+  96   1        COMx_InitStructure.UART_BaudRate  = bote;             //波特率, 一般 110 ~ 115200
+  97   1        COMx_InitStructure.UART_Interrupt = ENABLE;           //中断允许,   ENABLE或DISABLE
+  98   1        USART_Configuration(USARTx, &COMx_InitStructure);     //初始化串口1 USART1,USART2
+  99   1      }
+ 100          //========================================================================
+ 101          // 函数:u16 BSP_GetUsartRxBuffer(u8 USARTx,u8 *RxBuffer,u16 *lenth)
+ 102          // 描述: 读取串口缓存中的数据，续写，如协议匹配成功，lenth需软件清零
+ 103          // 参数：u8 USARTx为端口号，RxBuffer缓存区指针,缓存区的长度
+ 104          // 返回：读取的数据长度
+ 105          // 版本: V1.0, 2022-10-17
+ 106          //========================================================================
+ 107          u16 BSP_GetUsartRxBuffer(u8 USARTx,u8 *pRxBuffer,u16 Rxlenth)
+ 108          {
+ 109   1        xdata u16 remaindlen = 0;   //数组剩余空间大小，检验溢出时使用
+ 110   1        xdata u16 lenth = 0;        //缓存去数据长度
+ 111   1        xdata u16 i = 0;
+ 112   1        
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 3   
+
+ 113   1        
+ 114   1        if((USARTx == DISABLE) || (USARTx >= USARTMAX)) //硬件串口未初始化
+ 115   1        { 
+ 116   2          return 0;//返回0
+ 117   2        }
+ 118   1        //printf("BSP_GetUsartRxBuffer:USARTx = %b02d\r\n",USARTx);
+ 119   1        
+ 120   1        remaindlen = (u16)(Rx[USARTx-1].pEnd - Rx[USARTx-1].pIn) + 1;//计算剩余空间大小
+ 121   1        
+ 122   1        lenth = USART_ReadRxBuffer(USARTx,Rx[USARTx-1].pIn,remaindlen);//读取串口接收的缓存数据
+ 123   1        
+ 124   1        Rx[USARTx-1].pIn = (u8 *)(Rx[USARTx-1].pIn + lenth);//将指针移动到下一次需要写入数据的位
+             -置
+ 125   1        
+ 126   1        lenth = (u16)(Rx[USARTx-1].pIn - Rx[USARTx-1].pStart); //数据长度接续
+ 127   1        
+ 128   1        if(Rx[USARTx-1].pIn >= Rx[USARTx-1].pEnd) //检查数组是否越界
+ 129   1        {
+ 130   2        
+ 131   2          BSP_ClearUsartRxBuffer(USARTx);//软件自动清空缓存区域
+ 132   2      
+ 133   2          printf("BSP_GetUsartRxBuffer:Index overflow!!!  USARTx = %b02d\r\n",USARTx);
+ 134   2          
+ 135   2          #ifdef DEBUG
+                  printf("BSP_GetUsartRxBuffer:Index overflow!!!  USARTx = %b02d\r\n",USARTx);  
+                  #endif  
+ 138   2          
+ 139   2          lenth = 0;//软件自动清空缓存区域
+ 140   2        }
+ 141   1      
+ 142   1        if(lenth >= Rxlenth)//数据内容超过了需要写的缓存空间了
+ 143   1        {
+ 144   2          lenth = Rxlenth;  //截断数据
+ 145   2          
+ 146   2          printf("Rxlenth:Index overflow!!!  USARTx = %b02d\r\n",USARTx);
+ 147   2          
+ 148   2          for (i = 0;i < Rxlenth; i++) //数据拷贝
+ 149   2          {
+ 150   3            *pRxBuffer++ = *(Rx[USARTx-1].pStart+i);  
+ 151   3          }
+ 152   2          BSP_ClearUsartRxBuffer(USARTx);//软件自动清空缓存区域
+ 153   2        }
+ 154   1        else
+ 155   1        {
+ 156   2          for (i = 0;i < lenth; i++) //数据拷贝
+ 157   2          {
+ 158   3            *pRxBuffer++ = *(Rx[USARTx-1].pStart+i);  
+ 159   3          }
+ 160   2          
+ 161   2        }
+ 162   1        
+ 163   1        *pRxBuffer = '\0';         //仅用于后续字符串处理时作为结束符号使用
+ 164   1        
+ 165   1        return lenth;
+ 166   1        
+ 167   1      }
+ 168          #ifdef  STC15W4K48S4
+              //========================================================================
+              // 函数:u16 BSP_GetFormatRxBuffer(u8 USARTx,u8 *RxBuffer,u16 *lenth,u8 *cutstr)
+              // 描述: 获取串口缓存中的数据，按照cutstr进行切割读取.
+              // 参数：u8 USARTx为端口号，RxBuffer缓存区指针,Rxlenth缓存区的长度,u8 以*cutstr作为�
+             -��割字符串 cutlenth,是切割字符的长度
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 4   
+
+              // 返回：读取的数据长度
+              // 版本: V1.0, 2022-10-17
+              //========================================================================
+              u16 BSP_GetFormatRxBuffer(u8 USARTx,u8 *pRxBuffer,u16 Rxlenth,u8 *cutstr,u8 cutlenth)
+              {
+                xdata u16 lenth = 0;          //缓存数据长度
+                xdata u8  *pTemp     = NULL;
+                xdata u8  *pStart    = NULL;
+                xdata u8  *pcutstr    = NULL;
+                xdata u8  i  = 0;
+              
+                
+                if((USARTx == DISABLE) || (USARTx >= USARTMAX)) //硬件串口未初始化
+                { 
+                  return 0;//返回0
+                }
+                
+                lenth = BSP_GetUsartRxBuffer(USARTx,pRxBuffer,Rxlenth);//读取缓存数据
+                
+                pcutstr = ByteArrayCompar_r(pRxBuffer,lenth,cutstr,cutlenth);//找到切割字符串的位置，从后往
+             -前找。
+                
+                if(pcutstr == NULL)//未查询到切割字符
+                {
+                  memset(pRxBuffer,0,Rxlenth);//清空缓存数据
+                  
+                  //printf("BSP_GetFormatRxBuffer lenth = %h04d\r\n",lenth);
+                  
+                  lenth = 0;//读取长度为0
+                  
+                  
+                  return lenth;//返回0
+                }
+                //处理缓存区pRxBuffer的数据
+                if(*(cutstr+cutlenth-1) == '\n')//如果有换行符并且是末尾切分
+                {
+                  //printf("BSP_GetFormatRxBuffer lenth = %h04d\r\n",lenth);
+                  
+                  pcutstr = (u8 *)(pcutstr +1);//跳过切割字符
+                  
+                }
+                lenth = (u16)(pcutstr - pRxBuffer);//数据长度，返回给调用者
+                
+                memset(pcutstr,0,(u16)(Rxlenth - lenth));//清除多余的数据，返回给调用者
+                
+                //处理缓存区Rx的数据
+                pStart = Rx[USARTx-1].pStart;
+                
+                pTemp = (u8 *)(pStart + lenth);
+                
+                while (pTemp  < Rx[USARTx-1].pIn)
+                {
+                    *pStart++ = *pTemp++;    //将剩下的数据移到缓存区的首地址  
+                }
+                memset(pStart,0,(u16)(Rx[USARTx-1].pEnd - pStart +1));//清除后续缓存
+                
+                Rx[USARTx-1].pIn = pStart;
+                
+                return lenth;
+              }
+              #endif
+ 233          //========================================================================
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 5   
+
+ 234          // 函数:void BSP_ClearUsartRxBuffer(u8 USARTx)
+ 235          // 描述: 清理串口缓存数据
+ 236          // 参数：u8 USARTx为端口号
+ 237          // 版本: V1.0, 2022-10-17
+ 238          //========================================================================
+ 239          void BSP_ClearUsartRxBuffer(u8 USARTx)
+ 240          {
+ 241   1        xdata u16 lenth = 0;
+ 242   1      
+ 243   1        if((USARTx == DISABLE) || (USARTx >= USARTMAX))  return;//硬件串口未开启
+ 244   1        
+ 245   1        lenth = (u16)(Rx[USARTx-1].pEnd - Rx[USARTx-1].pStart + 1);//计算缓存区的总长度
+ 246   1        
+ 247   1        memset(Rx[USARTx-1].pStart, 0,lenth);//缓存区清零
+ 248   1        
+ 249   1        Rx[USARTx-1].pIn = Rx[USARTx-1].pStart;   //指向缓存区首地址
+ 250   1        
+ 251   1         #ifdef DEBUG
+                  printf("Rx[%b02d]Clear,OK!\r\n",(USARTx-1));
+                 #endif
+ 254   1      }
+ 255          //========================================================================
+ 256          // 函数:WaitForTISignal(u8 USARTx)
+ 257          // 描述: 等待串口数据发送完成，阻塞模式
+ 258          // 参数：u8 USARTx串口号
+ 259          // 版本: V1.0, 2022-10-17
+ 260          //========================================================================
+ 261          static void WaitForTISignal(u8 USARTx)
+ 262          {
+ 263   1        if(USARTx == USART1)
+ 264   1        {
+ 265   2          while(TI == 0); 
+ 266   2          TI = 0;
+ 267   2        }
+ 268   1        else if(USARTx == USART2)
+ 269   1        {
+ 270   2          while((S2CON & 2) == 0); 
+ 271   2          S2CON &= ~2;
+ 272   2        }
+ 273   1        #ifdef  STC15W4K48S4
+                else if(USARTx == USART3)
+                {
+                  while(TI3 ==0);
+                  CLR_TI3();
+                }
+                else if(USARTx == USART4)
+                {
+                  while(TI4==0);
+                  CLR_TI4();   
+                }
+                #endif
+ 285   1        else 
+ 286   1        {
+ 287   2          return;
+ 288   2        }
+ 289   1      }
+ 290          //========================================================================
+ 291          // 函数:void USART_SendData(u8 USARTx,u8 ch)
+ 292          // 描述: 串口数据发送模式，查询方式
+ 293          // 参数：u8 USARTx串口号,u8 ch需要发送的数据
+ 294          // 版本: V1.0, 2022-10-17
+ 295          //========================================================================
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 6   
+
+ 296          void USART_SendData(u8 USARTx,u8 ch)
+ 297          {
+ 298   1        #ifdef  STC12C5A60S2
+ 299   1          P483 =1;//483发送状态
+ 300   1          delay50us();
+ 301   1        #endif
+ 302   1        if((USARTx == DISABLE) || (USARTx >= USARTMAX)) //硬件串口未初始化
+ 303   1        { 
+ 304   2          return ;//直接返回
+ 305   2        }
+ 306   1        switch(USARTx)
+ 307   1        {
+ 308   2          case USART1:
+ 309   2                      SBUF = ch;
+ 310   2                      break;
+ 311   2          case USART2:
+ 312   2                      S2BUF = ch;
+ 313   2                      break;
+ 314   2      #ifdef  STC15W4K48S4
+                  case USART3:
+                              S3BUF = ch;
+                              break;    
+                  case USART4:
+                              S4BUF = ch;
+                              break;  
+              #endif
+ 322   2          default:
+ 323   2                      break;
+ 324   2          
+ 325   2        }
+ 326   1        WaitForTISignal(USARTx);//等待数据传输完成
+ 327   1        #ifdef  STC12C5A60S2
+ 328   1          P483 =0;//483接收状态
+ 329   1          delay50us();
+ 330   1        #endif  
+ 331   1      }
+ 332          //========================================================================
+ 333          // 函数:void USART_Sendbuffer(u8 USARTx,const u8 *ch, u16 lenth)
+ 334          // 描述: 串口数据发送模式，查询方式
+ 335          // 参数：u8 USARTx串口号,u8 ch需要发送的数据,lenth缓存区的长度
+ 336          // 版本: V1.0, 2022-10-17
+ 337          //========================================================================
+ 338          void USART_Sendbuffer(u8 USARTx,const u8 *ch, u16 lenth)
+ 339          {
+ 340   1        u16 i = 0;
+ 341   1        //printf("USART_Sendbuffer\r\n");
+ 342   1        for (i=0;i<lenth;i++)
+ 343   1        {
+ 344   2          USART_SendData(USARTx,*ch++);
+ 345   2        }
+ 346   1        
+ 347   1      }
+ 348          
+ 349          //========================================================================
+ 350          // 函数:printf_buffer(const char *name,const u8 *pbuffer,u16 lenth)
+ 351          // 描述: 格式化答应数组内容
+ 352          // 参数：name为打印出来的数组名称,pbuffer为数组名称，lenth为打印数组前多少个�
+             -�素
+ 353          // 版本: V1.0, 2022-10-17
+ 354          //========================================================================
+ 355          #ifdef DEBUG1
+              void printf_buffer(const char *name,const u8 *pbuffer,u16 lenth)
+C51 COMPILER V9.60.0.0   BSP_USART                                                         09/20/2025 15:17:35 PAGE 7   
+
+              {
+                int i = 0;
+                printf("%s:",name);
+                for (i = 0; i < lenth; i++)
+                {
+                  printf("%b02X",*pbuffer++); 
+                  printf(" ");      
+                }
+                printf("\r\n");
+              }
+              #endif
+ 368          //========================================================================
+ 369          // 函数:HextoStr(const u8 *pbuffer,char *pStr,u16 lenth)
+ 370          // 描述: 将字符数组转换成字符串，
+ 371          // 参数：pbuffer为字节数组名称，pStr需要保存字符串的地址，lenth为字节数组的长
+             -度
+ 372          // 版本: V1.0, 2022-10-17
+ 373          //========================================================================
+ 374          #ifdef  STC15W4K48S4  
+              void HextoStr(const u8 *pbuffer,u8 *pStr,u16 lenth)
+              {
+                u16 i = 0;
+                char temp[3] = "";
+                
+                xdata u8 num=0x2D;  //字头“ZBSJ,”的ASCII异或值
+                
+                for (i = 0; i < lenth-1; i++) //格式化到校验和前一位
+                {
+                  sprintf(temp,"%b02X",*pbuffer++);
+                  strcat(pStr,temp);
+                  num^=temp[0];     //异或校验
+                  num^=temp[1];
+              
+                }
+                
+                strcat(pStr,"*");           //校验和定界符。为数据内容和校验和字段的分隔符。
+                sprintf(temp,"%b02X",num);  //格式化异或校验和
+                strcat(pStr,temp);          //追加校验和数据
+                strcat(pStr,"\r\n");        //终止符（ASCII 码字符 HEX0D0A）。标志一个语句的结束。
+                
+              /*
+                校验和为语句中“$”和“*”之间(不含符号“$”和“*”)全部字符按字节异或的
+             -结果，
+              */
+              }
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1348    ----
+   CONSTANT SIZE    =    101    ----
+   XDATA SIZE       =     84      37
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

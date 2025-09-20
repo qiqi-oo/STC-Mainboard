@@ -1,0 +1,1360 @@
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP_FLASH
+OBJECT MODULE PLACED IN .\Objects\bsp_flash.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Bsp\bsp_flash.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\bsp_flash.lst) TABS(2) OBJECT(.\Objects\bsp_flash.obj)
+
+line level    source
+
+   1          #include "./User/includes.h"
+   2          
+   3          xdata FlashParameterTypeDef FlashCacheBuf = {0};//用于储存FLASH中的的数据（将flash的数据读�
+             -��SRAM中）
+   4          
+   5          //指针常量，指向flash数据在内存中的首地址，全局变量可在各个文件中使用
+   6          xdata FlashParameterTypeDef const *const pFlash  =  &FlashCacheBuf;
+   7          //========================================================================
+   8          // 函数:BSP_GetFlashConfig(SignalLineTotalTypeDef *pFlash)
+   9          // 描述: 读取flash里面的配置参数
+  10          // 参数：*pFlash指向需要保存数据的内存首地址3
+  11          // 版本: V1.0, 2022-10-17
+  12          //========================================================================
+  13          void BSP_GetFlashConfig(void)
+  14          {
+  15   1      
+  16   1            //主板与上位机的连接串口号
+  17   1            pFlash->upload.com            =     IapReadByte(FLASH_ADDR_UPLOAD_COM);         //主板与上位机的连�
+             -��串口号
+  18   1            pFlash->upload.bote           =     IapReadByte(FLASH_ADDR_UPLOAD_BOTE);        //主板与上位机的�
+             -�接串口波特率
+  19   1        
+  20   1            //主板与GPS的连接串口号
+  21   1            pFlash->gps.com               =     IapReadByte(FLASH_ADDR_GPS_COM);            //主板与GPS的连接串口�
+             -��
+  22   1            pFlash->gps.bote              =     IapReadByte(FLASH_ADDR_GPS_BOTE);           //主板与GPS的连接串�
+             -��波特率
+  23   1            pFlash->gps.remap             =     IapReadByte(FLASH_ADDR_GPS_COM_REMAP);      //主板与GPS的连接�
+             -��口重映射
+  24   1        
+  25   1        
+  26   1        
+  27   1            //主板与高森碰杆传感器连接的串口
+  28   1            pFlash->bump_hs.com           =     IapReadByte(FLASH_ADDR_BUMP_HS_COM);        //主板与上位机的连
+             -接串口号
+  29   1            pFlash->bump_hs.bote          =     IapReadByte(FLASH_ADDR_BUMP_HS_BOTE);       //主板与上位机的
+             -连接串口波特率
+  30   1        
+  31   1            //主板与2.4G碰杆传感器连接的串口
+  32   1            pFlash->bump_24g.com          =     IapReadByte(FLASH_ADDR_BUMP_24G_COM);       //主板与2.4G碰杆传�
+             -��器连接串口号
+  33   1            pFlash->bump_24g.bote         =     IapReadByte(FLASH_ADDR_BUMP_24G_BOTE);      //主板与2.4G碰杆�
+             -�感器连接串口波特率
+  34   1        
+  35   1        
+  36   1            //主板与倾角连接的串口（汇总后上传）
+  37   1            pFlash->titl_all.com          =     IapReadByte(FLASH_ADDR_TILT_ALL_COM);       //主板与倾角连接�
+             -�串口（汇总后上传）串口号
+  38   1            pFlash->titl_all.bote         =     IapReadByte(FLASH_ADDR_TILT_BOTE);          //主板与倾角连接的
+             -串口波特率
+  39   1        
+  40   1            //主板与前轴倾角传感器的连接串口号（单传感器连接）
+  41   1            pFlash->titl_q.com            =     IapReadByte(FLASH_ADDR_TILT_Q_COM);         //主板与前轴倾角传�
+             -��器的连接串口号（单传感器连接）
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 2   
+
+  42   1            pFlash->titl_q.bote           =     IapReadByte(FLASH_ADDR_TILT_BOTE);          //主板与倾角连接的
+             -串口波特率
+  43   1            
+  44   1            //主板与后轴倾角传感器的连接串口号（单传感器连接）
+  45   1            pFlash->titl_h.com            =     IapReadByte(FLASH_ADDR_TILT_H_COM);         //主板与后轴倾角传�
+             -��器的连接串口号（单传感器连接）
+  46   1            pFlash->titl_h.bote           =     IapReadByte(FLASH_ADDR_TILT_BOTE);          //主板与倾角连接的
+             -串口波特率
+  47   1            
+  48   1            //主板与挂轴倾角传感器的连接串口号（单传感器连接）
+  49   1            pFlash->titl_g.com            =     IapReadByte(FLASH_ADDR_TILT_G_COM);         //主板与挂轴倾角传�
+             -��器的连接串口号（单传感器连接）
+  50   1            pFlash->titl_g.bote           =     IapReadByte(FLASH_ADDR_TILT_BOTE);          //主板与倾角连接的
+             -串口波特率
+  51   1            
+  52   1            //主板与二轮摩托车倾角传感器的连接串口号（单传感器连接）
+  53   1            pFlash->titl_mtc.com          =     IapReadByte(FLASH_ADDR_TILT_MTC_COM);       //主板与二轮摩托�
+             -�倾角传感器的连接串口号（单传感器连接）
+  54   1            pFlash->titl_mtc.bote         =     IapReadByte(FLASH_ADDR_TILT_BOTE);          //主板与倾角连接�
+             -�串口波特率
+  55   1            
+  56   1            //主板网口模块
+  57   1            pFlash->network.com           =     IapReadByte(FLASH_ADDR_NETWORK_COM);        //主板网络模块是否
+             -启用
+  58   1            
+  59   1            
+  60   1            //主板与超声波（单边桥）传感器的连接串口号（单传感器连接）
+  61   1            pFlash->csb_dbq.com           =     IapReadByte(FLASH_ADDR_CSB_DBQ_COM);        //主板与挂轴倾角传
+             -感器的连接串口号（单传感器连接）
+  62   1            pFlash->csb_dbq.bote          =     IapReadByte(FLASH_ADDR_CSB_DBQ_BOTE);         //主板与倾角连�
+             -�的串口波特率
+  63   1            
+  64   1            //主板与超声波（隧道）传感器的连接串口号（单传感器连接）
+  65   1            pFlash->csb_sd.com            =     IapReadByte(FLASH_ADDR_CSB_SD_COM);       //主板与二轮摩托车�
+             -��角传感器的连接串口号（单传感器连接）
+  66   1            pFlash->csb_sd.bote           =     IapReadByte(FLASH_ADDR_CSB_SD_BOTE);          //主板与倾角连接
+             -的串口波特率
+  67   1        
+  68   1            //座椅开关（调节）
+  69   1            pFlash->zytj.pin              =     IapReadByte(FLASH_ADDR_ZYTJ_PIN);           //座椅开关（调节）�
+             -�入管脚位置
+  70   1            pFlash->zytj.modle            =     IapReadByte(FLASH_ADDR_ZYTJ_MODEL);         //座椅开关（调节�
+             -��输入模式
+  71   1            pFlash->zytj.rising_ed        =     IapReadByte(FLASH_ADDR_ZYTJ_RISING_ED);     //座椅开关（调节�
+             -��上升沿消抖
+  72   1            pFlash->zytj.falling_ed       =     IapReadByte(FLASH_ADDR_ZYTJ_FALLING_ED);    //座椅开关（调节�
+             -�下降沿消抖
+  73   1            pFlash->zytj.type             =     IapReadByte(FLASH_ADDR_ZYTJ_TYPE);          //座椅开关（调节）评�
+             -�类型和方式
+  74   1            //手刹开关
+  75   1            pFlash->ss.pin                =     IapReadByte(FLASH_ADDR_SS_PIN);             //手刹开关输入�
+             -�脚位置
+  76   1            pFlash->ss.modle              =     IapReadByte(FLASH_ADDR_SS_MODEL);           //手刹开关输入模�
+             -��
+  77   1            pFlash->ss.rising_ed          =     IapReadByte(FLASH_ADDR_SS_RISING_ED);       //手刹开关上升沿
+             -消抖
+  78   1            pFlash->ss.falling_ed         =     IapReadByte(FLASH_ADDR_SS_FALLING_ED);      //手刹开关下降沿�
+             -��抖
+  79   1            pFlash->ss.type               =     IapReadByte(FLASH_ADDR_SS_TYPE);            //手刹开关评判类型和方�
+             -��
+  80   1            //左转开关
+  81   1            pFlash->zz.pin                =     IapReadByte(FLASH_ADDR_ZZ_PIN);             //左转开关输入管
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 3   
+
+             -脚位置
+  82   1            pFlash->zz.modle              =     IapReadByte(FLASH_ADDR_ZZ_MODEL);           //左转开关输入模�
+             -��
+  83   1            pFlash->zz.rising_ed          =     IapReadByte(FLASH_ADDR_ZZ_RISING_ED);       //左转开关上升沿
+             -消抖
+  84   1            pFlash->zz.falling_ed         =     IapReadByte(FLASH_ADDR_ZZ_FALLING_ED);      //左转开关下降沿�
+             -��抖
+  85   1            pFlash->zz.type               =     IapReadByte(FLASH_ADDR_ZZ_TYPE);            //左转开关评判类型和方�
+             -��
+  86   1            //右转开关
+  87   1            pFlash->yz.pin                =     IapReadByte(FLASH_ADDR_YZ_PIN);             //右转开关输入管�
+             -��位置
+  88   1            pFlash->yz.modle              =     IapReadByte(FLASH_ADDR_YZ_MODEL);           //右转开关输入模�
+             -��
+  89   1            pFlash->yz.rising_ed          =     IapReadByte(FLASH_ADDR_YZ_RISING_ED);       //右转开关上升沿
+             -消抖
+  90   1            pFlash->yz.falling_ed         =     IapReadByte(FLASH_ADDR_YZ_FALLING_ED);      //右转开关下降沿�
+             -��抖
+  91   1            pFlash->yz.type               =     IapReadByte(FLASH_ADDR_YZ_TYPE);            //右转开关评判类型和方�
+             -��
+  92   1            //远光开关
+  93   1            pFlash->yg.pin                =     IapReadByte(FLASH_ADDR_YG_PIN);             //远光开关输入管�
+             -��位置
+  94   1            pFlash->yg.modle              =     IapReadByte(FLASH_ADDR_YG_MODEL);           //远光开关输入模�
+             -��
+  95   1            pFlash->yg.rising_ed          =     IapReadByte(FLASH_ADDR_YG_RISING_ED);       //远光开关上升沿
+             -消抖
+  96   1            pFlash->yg.falling_ed         =     IapReadByte(FLASH_ADDR_YG_FALLING_ED);      //远光开关下降沿�
+             -�抖
+  97   1            pFlash->yg.type               =     IapReadByte(FLASH_ADDR_YG_TYPE);            //远光开关评判类型和方�
+             -��
+  98   1            //近光开关
+  99   1            pFlash->jg.pin                =     IapReadByte(FLASH_ADDR_JG_PIN);             //近光开关输入管�
+             -��位置
+ 100   1            pFlash->jg.modle              =     IapReadByte(FLASH_ADDR_JG_MODEL);           //近光开关输入模�
+             -��
+ 101   1            pFlash->jg.rising_ed          =     IapReadByte(FLASH_ADDR_JG_RISING_ED);       //近光开关上升沿
+             -消抖
+ 102   1            pFlash->jg.falling_ed         =     IapReadByte(FLASH_ADDR_JG_FALLING_ED);      //近光开关下降沿�
+             -��抖
+ 103   1            pFlash->jg.type               =     IapReadByte(FLASH_ADDR_JG_TYPE);            //近光开关评判类型和方�
+             -��
+ 104   1            //离合开关
+ 105   1            pFlash->lh.pin                =     IapReadByte(FLASH_ADDR_LH_PIN);             //离合开关输入管
+             -脚位置
+ 106   1            pFlash->lh.modle              =     IapReadByte(FLASH_ADDR_LH_MODEL);           //离合开关输入模�
+             -��
+ 107   1            pFlash->lh.rising_ed          =     IapReadByte(FLASH_ADDR_LH_RISING_ED);       //离合开关上升沿
+             -消抖
+ 108   1            pFlash->lh.falling_ed         =     IapReadByte(FLASH_ADDR_LH_FALLING_ED);      //离合开关下降沿�
+             -�抖
+ 109   1            pFlash->lh.type           =     IapReadByte(FLASH_ADDR_LH_TYPE);            //离合开关评判类型和方式
+ 110   1            //脚刹开关
+ 111   1            pFlash->js.pin                =     IapReadByte(FLASH_ADDR_JS_PIN);             //脚刹开关输入�
+             -�脚位置
+ 112   1            pFlash->js.modle              =     IapReadByte(FLASH_ADDR_JS_MODEL);           //脚刹开关输入模
+             -式
+ 113   1            pFlash->js.rising_ed          =     IapReadByte(FLASH_ADDR_JS_RISING_ED);       //脚刹开关上升沿
+             -消抖
+ 114   1            pFlash->js.falling_ed         =     IapReadByte(FLASH_ADDR_JS_FALLING_ED);      //脚刹开关下降沿
+             -消抖
+ 115   1            pFlash->js.type               =     IapReadByte(FLASH_ADDR_JS_TYPE);            //脚刹开关评判类型和方�
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 4   
+
+             -��
+ 116   1            //熄火开关
+ 117   1            pFlash->xh.pin                =     IapReadByte(FLASH_ADDR_XH_PIN);             //熄火开关输入�
+             -�脚位置
+ 118   1            pFlash->xh.modle              =     IapReadByte(FLASH_ADDR_XH_MODEL);           //熄火开关输入模�
+             -��
+ 119   1            pFlash->xh.rising_ed          =     IapReadByte(FLASH_ADDR_XH_RISING_ED);       //熄火开关上升沿
+             -消抖
+ 120   1            pFlash->xh.falling_ed         =     IapReadByte(FLASH_ADDR_XH_FALLING_ED);      //熄火开关下降沿�
+             -��抖
+ 121   1            pFlash->xh.type               =     IapReadByte(FLASH_ADDR_XH_TYPE);            //熄火开关评判方�
+             -��
+ 122   1            //启动开关
+ 123   1            pFlash->qd.pin                =     IapReadByte(FLASH_ADDR_QD_PIN);             //启动开关输入�
+             -�脚位置
+ 124   1            pFlash->qd.modle              =     IapReadByte(FLASH_ADDR_QD_MODEL);           //启动开关输入模
+             -式
+ 125   1            pFlash->qd.rising_ed          =     IapReadByte(FLASH_ADDR_QD_RISING_ED);       //启动开关上升沿
+             -消抖
+ 126   1            pFlash->qd.falling_ed         =     IapReadByte(FLASH_ADDR_QD_FALLING_ED);      //启动开关下降沿�
+             -��抖
+ 127   1            pFlash->qd.type               =     IapReadByte(FLASH_ADDR_QD_TYPE);            //启动方式  
+ 128   1            //安全带开关
+ 129   1            pFlash->aqd.pin               =     IapReadByte(FLASH_ADDR_AQD_PIN);            //安全带开关输入�
+             -��脚位置
+ 130   1            pFlash->aqd.modle             =     IapReadByte(FLASH_ADDR_AQD_MODEL);          //安全带开关输入�
+             -��式
+ 131   1            pFlash->aqd.rising_ed         =     IapReadByte(FLASH_ADDR_AQD_RISING_ED);      //安全带开关上升
+             -沿消抖
+ 132   1            pFlash->aqd.falling_ed        =     IapReadByte(FLASH_ADDR_AQD_FALLING_ED);     //安全带开关下降
+             -沿消抖
+ 133   1            pFlash->aqd.type              =     IapReadByte(FLASH_ADDR_AQD_TYPE);           //安全带开关评判类型�
+             -�方式
+ 134   1            //示警开关
+ 135   1            pFlash->sj.pin                =     IapReadByte(FLASH_ADDR_SJ_PIN);             //示警开关输入管�
+             -��位置
+ 136   1            pFlash->sj.modle              =     IapReadByte(FLASH_ADDR_SJ_MODEL);           //示警开关输入模�
+             -��
+ 137   1            pFlash->sj.rising_ed          =     IapReadByte(FLASH_ADDR_SJ_RISING_ED);       //示警开关上升沿�
+             -��抖
+ 138   1            pFlash->sj.falling_ed         =     IapReadByte(FLASH_ADDR_SJ_FALLING_ED);      //示警开关下降沿�
+             -�抖
+ 139   1            pFlash->sj.type               =     IapReadByte(FLASH_ADDR_SJ_TYPE);            //示警开关评判类型和方�
+             -��
+ 140   1            //小灯开关
+ 141   1            pFlash->xd.pin                =     IapReadByte(FLASH_ADDR_XD_PIN);             //小灯开关输入管�
+             -��位置
+ 142   1            pFlash->xd.modle              =     IapReadByte(FLASH_ADDR_XD_MODEL);           //小灯开关输入模�
+             -��
+ 143   1            pFlash->xd.rising_ed          =     IapReadByte(FLASH_ADDR_XD_RISING_ED);       //小灯开关上升沿
+             -消抖
+ 144   1            pFlash->xd.falling_ed         =     IapReadByte(FLASH_ADDR_XD_FALLING_ED);      //小灯开关下降沿�
+             -��抖
+ 145   1            pFlash->xd.type               =     IapReadByte(FLASH_ADDR_XD_TYPE);            //小灯开关评判类型和方�
+             -��
+ 146   1            //喇叭开关
+ 147   1            pFlash->lb.pin                =     IapReadByte(FLASH_ADDR_LB_PIN);             //喇叭开关输入管
+             -脚位置
+ 148   1            pFlash->lb.modle              =     IapReadByte(FLASH_ADDR_LB_MODEL);           //喇叭开关输入模�
+             -��
+ 149   1            pFlash->lb.rising_ed          =     IapReadByte(FLASH_ADDR_LB_RISING_ED);       //喇叭开关上升沿
+             -消抖
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 5   
+
+ 150   1            pFlash->lb.falling_ed         =     IapReadByte(FLASH_ADDR_LB_FALLING_ED);      //喇叭开关下降沿�
+             -��抖
+ 151   1            pFlash->lb.type               =     IapReadByte(FLASH_ADDR_LB_TYPE);            //喇叭开关评判类型和方�
+             -��
+ 152   1            //车门开关
+ 153   1            pFlash->cm.pin                =     IapReadByte(FLASH_ADDR_CM_PIN);             //车门开关输入管
+             -脚位置
+ 154   1            pFlash->cm.modle              =     IapReadByte(FLASH_ADDR_CM_MODEL);           //车门开关输入模�
+             -��
+ 155   1            pFlash->cm.rising_ed          =     IapReadByte(FLASH_ADDR_CM_RISING_ED);       //车门开关上升沿
+             -消抖
+ 156   1            pFlash->cm.falling_ed         =     IapReadByte(FLASH_ADDR_CM_FALLING_ED);      //车门开关下降沿�
+             -�抖
+ 157   1            pFlash->cm.type               =     IapReadByte(FLASH_ADDR_CM_TYPE);            //车门开关评判类型和方�
+             -��
+ 158   1            //挡位传感器
+ 159   1            pFlash->dw.pin1               =     IapReadByte(FLASH_ADDR_DW_PIN1);            //挡位传感器信号
+             -线1输入管脚位置
+ 160   1            pFlash->dw.pin2               =     IapReadByte(FLASH_ADDR_DW_PIN2);            //挡位传感器信号线
+             -2输入管脚位置
+ 161   1            pFlash->dw.pin3               =     IapReadByte(FLASH_ADDR_DW_PIN3);            //挡位传感器信号线3�
+             -�入管脚位置
+ 162   1            pFlash->dw.pin4               =     IapReadByte(FLASH_ADDR_DW_PIN4);            //挡位传感器信号线4输�
+             -��管脚位置
+ 163   1            pFlash->dw.pin5               =     IapReadByte(FLASH_ADDR_DW_PIN5);            //挡位传感器信号线5输�
+             -��管脚位置
+ 164   1            pFlash->dw.modle              =     IapReadByte(FLASH_ADDR_DW_MODEL);           //挡位传感器输入�
+             -�式
+ 165   1            pFlash->dw.rising_ed          =     IapReadByte(FLASH_ADDR_DW_RISING_ED);       //挡位传感器上升�
+             -�消抖
+ 166   1            pFlash->dw.falling_ed         =     IapReadByte(FLASH_ADDR_DW_FALLING_ED);      //挡位传感器下降�
+             -��消抖
+ 167   1            pFlash->dw.value[0]           =     IapReadByte(FLASH_ADDR_DW_VALUE_1);         //1挡位标定值
+ 168   1            pFlash->dw.value[1]           =     IapReadByte(FLASH_ADDR_DW_VALUE_2);         //2挡位标定值
+ 169   1            pFlash->dw.value[2]           =     IapReadByte(FLASH_ADDR_DW_VALUE_3);         //3挡位标定值
+ 170   1            pFlash->dw.value[3]           =     IapReadByte(FLASH_ADDR_DW_VALUE_4);         //4挡位标定值
+ 171   1            pFlash->dw.value[4]           =     IapReadByte(FLASH_ADDR_DW_VALUE_5);         //5挡位标定值
+ 172   1            pFlash->dw.value[5]           =     IapReadByte(FLASH_ADDR_DW_VALUE_R);         //倒挡挡位标定值
+ 173   1            pFlash->dw.value[6]           =     IapReadByte(FLASH_ADDR_DW_VALUE_ZERO);      //空挡挡位标定值
+ 174   1            pFlash->dw.type               =     IapReadByte(FLASH_ADDR_DW_TYPE);            //挡位传感器类型
+ 175   1            //左后视开关
+ 176   1            pFlash->zhs.pin               =     IapReadByte(FLASH_ADDR_ZHS_PIN);            //左后视开关输入�
+             -��脚位置
+ 177   1            pFlash->zhs.modle             =     IapReadByte(FLASH_ADDR_ZHS_MODEL);          //左后视开关输入�
+             -��式
+ 178   1            pFlash->zhs.rising_ed         =     IapReadByte(FLASH_ADDR_ZHS_RISING_ED);      //左后视开关上升
+             -沿消抖
+ 179   1            pFlash->zhs.falling_ed        =     IapReadByte(FLASH_ADDR_ZHS_FALLING_ED);     //左后视开关下降�
+             -�消抖
+ 180   1            pFlash->zhs.type              =     IapReadByte(FLASH_ADDR_ZHS_TYPE);           //左后视开关评判类型�
+             -�方式
+ 181   1            //内后视开关
+ 182   1            pFlash->nhs.pin               =     IapReadByte(FLASH_ADDR_NHS_PIN);            //内后视开关输入�
+             -��脚位置
+ 183   1            pFlash->nhs.modle             =     IapReadByte(FLASH_ADDR_NHS_MODEL);          //内后视开关输入�
+             -��式
+ 184   1            pFlash->nhs.rising_ed         =     IapReadByte(FLASH_ADDR_NHS_RISING_ED);      //内后视开关上升
+             -沿消抖
+ 185   1            pFlash->nhs.falling_ed        =     IapReadByte(FLASH_ADDR_NHS_FALLING_ED);     //内后视开关下降�
+             -��消抖
+ 186   1            pFlash->nhs.type              =     IapReadByte(FLASH_ADDR_NHS_TYPE);           //内后视开关评判类型�
+             -��方式
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 6   
+
+ 187   1            //副刹开关
+ 188   1            pFlash->fsc.pin               =     IapReadByte(FLASH_ADDR_FSC_PIN);            //副刹开关输入管
+             -脚位置
+ 189   1            pFlash->fsc.modle             =     IapReadByte(FLASH_ADDR_FSC_MODEL);          //副刹开关输入模�
+             -��
+ 190   1            pFlash->fsc.rising_ed         =     IapReadByte(FLASH_ADDR_FSC_RISING_ED);      //副刹开关上升沿
+             -消抖
+ 191   1            pFlash->fsc.falling_ed        =     IapReadByte(FLASH_ADDR_FSC_FALLING_ED);     //副刹开关下降沿
+             -消抖
+ 192   1            pFlash->fsc.type              =     IapReadByte(FLASH_ADDR_FSC_TYPE);           //副刹开关评判类型和�
+             -�式
+ 193   1            //雾灯开关
+ 194   1            pFlash->wd.pin                =     IapReadByte(FLASH_ADDR_WD_PIN);             //雾灯开关输入管�
+             -��位置
+ 195   1            pFlash->wd.modle              =     IapReadByte(FLASH_ADDR_WD_MODEL);           //雾灯开关输入模�
+             -��
+ 196   1            pFlash->wd.rising_ed          =     IapReadByte(FLASH_ADDR_WD_RISING_ED);       //雾灯开关上升沿
+             -消抖
+ 197   1            pFlash->wd.falling_ed         =     IapReadByte(FLASH_ADDR_WD_FALLING_ED);      //雾灯开关下降沿�
+             -��抖
+ 198   1            pFlash->wd.type               =     IapReadByte(FLASH_ADDR_WD_TYPE);            //雾灯开关评判类型和方�
+             -��
+ 199   1            //雨刷开关
+ 200   1            pFlash->ys.pin                =     IapReadByte(FLASH_ADDR_YS_PIN);             //雨刷开关输入�
+             -�脚位置
+ 201   1            pFlash->ys.modle              =     IapReadByte(FLASH_ADDR_YS_MODEL);           //雨刷开关输入模�
+             -��
+ 202   1            pFlash->ys.rising_ed          =     IapReadByte(FLASH_ADDR_YS_RISING_ED);       //雨刷开关上升沿
+             -消抖
+ 203   1            pFlash->ys.falling_ed         =     IapReadByte(FLASH_ADDR_YS_FALLING_ED);      //雨刷开关下降沿�
+             -��抖
+ 204   1            pFlash->ys.type               =     IapReadByte(FLASH_ADDR_YS_TYPE);            //雨刷开关评判类型和方�
+             -��
+ 205   1            //倒车灯开关
+ 206   1            pFlash->dcd.pin               =     IapReadByte(FLASH_ADDR_DCD_PIN);            //倒车灯开关输入
+             -管脚位置
+ 207   1            pFlash->dcd.modle             =     IapReadByte(FLASH_ADDR_DCD_MODEL);          //倒车灯开关输入�
+             -�式
+ 208   1            pFlash->dcd.rising_ed         =     IapReadByte(FLASH_ADDR_DCD_RISING_ED);      //倒车灯开关上升
+             -沿消抖
+ 209   1            pFlash->dcd.falling_ed        =     IapReadByte(FLASH_ADDR_DCD_FALLING_ED);     //倒车灯开关下降
+             -沿消抖
+ 210   1            pFlash->dcd.type              =     IapReadByte(FLASH_ADDR_DCD_TYPE);           //倒车灯开关评判类型�
+             -�方式
+ 211   1            //钥匙门开关
+ 212   1            pFlash->ysm.pin               =     IapReadByte(FLASH_ADDR_YSM_PIN);            //钥匙门开关输入�
+             -��脚位置
+ 213   1            pFlash->ysm.modle             =     IapReadByte(FLASH_ADDR_YSM_MODEL);          //钥匙门开关输入�
+             -�式
+ 214   1            pFlash->ysm.rising_ed         =     IapReadByte(FLASH_ADDR_YSM_RISING_ED);      //钥匙门开关上升�
+             -��消抖
+ 215   1            pFlash->ysm.falling_ed        =     IapReadByte(FLASH_ADDR_YSM_FALLING_ED);     //钥匙门开关下降�
+             -�消抖
+ 216   1            pFlash->ysm.type              =     IapReadByte(FLASH_ADDR_YSM_TYPE);           //钥匙门开关评判类型�
+             -�方式
+ 217   1            //绕车开关1
+ 218   1            pFlash->rc.pin1               =     IapReadByte(FLASH_ADDR_RC_PIN1);            //绕车1号开关输�
+             -�管脚位置
+ 219   1            pFlash->rc.pin2               =     IapReadByte(FLASH_ADDR_RC_PIN2);            //绕车2号开关输入管
+             -脚位置
+ 220   1            pFlash->rc.pin3               =     IapReadByte(FLASH_ADDR_RC_PIN3);            //绕车3号开关输入管脚
+             -位置
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 7   
+
+ 221   1            pFlash->rc.modle              =     IapReadByte(FLASH_ADDR_RC_MODEL);           //绕车开关输入模�
+             -�
+ 222   1            pFlash->rc.rising_ed          =     IapReadByte(FLASH_ADDR_RC_RISING_ED);       //绕车开关上升沿�
+             -��抖
+ 223   1            pFlash->rc.falling_ed         =     IapReadByte(FLASH_ADDR_RC_FALLING_ED);      //绕车开关下降沿�
+             -�抖
+ 224   1            pFlash->rc.type               =     IapReadByte(FLASH_ADDR_RC_TYPE);            //绕车开关1类型
+ 225   1            //闯动开关
+ 226   1            pFlash->cd.pin                =     IapReadByte(FLASH_ADDR_CD_PIN);             //闯动开关输入管�
+             -�位置
+ 227   1            pFlash->cd.modle              =     IapReadByte(FLASH_ADDR_CD_MODEL);           //闯动开关输入模式
+ 228   1            pFlash->cd.rising_ed          =     IapReadByte(FLASH_ADDR_CD_RISING_ED);       //闯动开关上升沿�
+             -�抖
+ 229   1            pFlash->cd.falling_ed         =     IapReadByte(FLASH_ADDR_CD_FALLING_ED);      //闯动开关下降沿�
+             -�抖
+ 230   1            pFlash->cd.type               =     IapReadByte(FLASH_ADDR_CD_TYPE);            //闯动开关评判类型和方�
+             -��
+ 231   1            //座椅开关（压力）
+ 232   1            pFlash->zyyl.pin              =     IapReadByte(FLASH_ADDR_ZYYL_PIN);           //座椅开关（压�
+             -�）输入管脚位置
+ 233   1            pFlash->zyyl.modle            =     IapReadByte(FLASH_ADDR_ZYYL_MODEL);         //座椅开关（压力�
+             -��输入模式
+ 234   1            pFlash->zyyl.rising_ed        =     IapReadByte(FLASH_ADDR_ZYYL_RISING_ED);     //座椅开关（压力
+             -）上升沿消抖
+ 235   1            pFlash->zyyl.falling_ed       =     IapReadByte(FLASH_ADDR_ZYYL_FALLING_ED);    //座椅开关下降沿
+             -消抖
+ 236   1            pFlash->zyyl.type             =     IapReadByte(FLASH_ADDR_ZYYL_TYPE);          //座椅开关评判类型和�
+             -�式
+ 237   1            //里程计数
+ 238   1            pFlash->lc.pin                =     IapReadByte(FLASH_ADDR_LCJS_PIN);           //里程计数输入管
+             -脚位置
+ 239   1            pFlash->lc.modle              =     IapReadByte(FLASH_ADDR_LCJS_MODEL);         //里程计数输入模�
+             -�
+ 240   1            pFlash->lc.rising_ed          =     IapReadByte(FLASH_ADDR_LCJS_RISING_ED);     //里程计数下降沿�
+             -��抖
+ 241   1            pFlash->lc.falling_ed         =     IapReadByte(FLASH_ADDR_LCJS_FALLING_ED);    //里程计数上升沿�
+             -��抖
+ 242   1            pFlash->lc.type               =     IapReadByte(FLASH_ADDR_LCJS_TYPE);          //里程计数评判类型和方
+             -式
+ 243   1            //观察仪表盘
+ 244   1            pFlash->gcybp.pin             =     IapReadByte(FLASH_ADDR_GCYBP_PIN);          //观察仪表盘输�
+             -�管脚位置
+ 245   1            pFlash->gcybp.modle           =     IapReadByte(FLASH_ADDR_GCYBP_MODEL);        //观察仪表盘输入
+             -模式
+ 246   1            pFlash->gcybp.rising_ed       =     IapReadByte(FLASH_ADDR_GCYBP_RISING_ED);    //观察仪表盘上升
+             -沿消抖
+ 247   1            pFlash->gcybp.falling_ed      =     IapReadByte(FLASH_ADDR_GCYBP_FALLING_ED);   //观察仪表盘下降
+             -沿消抖
+ 248   1            pFlash->gcybp.type            =     IapReadByte(FLASH_ADDR_GCYBP_TYPE);         //观察仪表盘评判类型
+             -和方式
+ 249   1            
+ 250   1            //触发开始考试
+ 251   1            pFlash->begin.pin             =     IapReadByte(FLASH_ADDR_BEGIN_PIN);          //触发开始考试�
+             -�入管脚位置
+ 252   1            pFlash->begin.modle           =     IapReadByte(FLASH_ADDR_BEGIN_MODEL);        //触发开始考试输
+             -入模式
+ 253   1            pFlash->begin.rising_ed       =     IapReadByte(FLASH_ADDR_BEGIN_RISING_ED);    //触发开始考试上
+             -升沿消抖
+ 254   1            pFlash->begin.falling_ed      =     IapReadByte(FLASH_ADDR_BEGIN_FALLING_ED);   //触发开始考试下
+             -降沿消抖
+ 255   1            pFlash->begin.type            =     IapReadByte(FLASH_ADDR_BEGIN_TYPE);         //触发开始考试评判类
+             -型和方式
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 8   
+
+ 256   1            //转速
+ 257   1            pFlash->zs.pin                =     IapReadByte(FLASH_ADDR_ZS_PIN);              //启动发动机时最小
+             -脉冲计数（大于该值车辆启动）
+ 258   1            pFlash->zs.min                =     IapReadByte(FLASH_ADDR_ZS_IDLIN_MIN);        //转速怠速最小脉�
+             -�计数
+ 259   1            pFlash->zs.max                =     IapReadByte(FLASH_ADDR_ZS_XH_MAX);           //熄火后发动机的�
+             -�大脉冲计数（小于该值车辆熄火）
+ 260   1            pFlash->zs.bs                 =     IapReadByte(FLASH_ADDR_ZS_BS);               //转速脉冲计数放大倍数
+ 261   1            pFlash->zs.sampling_time      =     IapReadByte(FLASH_ADDR_ZS_SAMPLING_TIME);    //转速脉冲采样�
+             -�间
+ 262   1            pFlash->zs.init_value         =     IapReadByte(FLASH_ADDR_ZS_INIT_VALUE);       //初始转速 0=默认0，
+             -1=默认800
+ 263   1            //单边桥传感器
+ 264   1            pFlash->dbq.pin1              =     IapReadByte(FLASH_ADDR_DBQ_PIN1);             //单边桥信号输入�
+             -��脚位置1
+ 265   1            pFlash->dbq.pin2              =     IapReadByte(FLASH_ADDR_DBQ_PIN2);             //单边桥信号输入�
+             -�脚位置2
+ 266   1            pFlash->dbq.pin3              =     IapReadByte(FLASH_ADDR_DBQ_PIN3);             //单边桥信号输入管脚
+             -位置3
+ 267   1            pFlash->dbq.pin4              =     IapReadByte(FLASH_ADDR_DBQ_PIN4);             //单边桥信号输入管脚
+             -位置4
+ 268   1            pFlash->dbq.pin5              =     IapReadByte(FLASH_ADDR_DBQ_PIN5);             //单边桥信号输入管脚�
+             -��置5
+ 269   1            pFlash->dbq.pin6              =     IapReadByte(FLASH_ADDR_DBQ_PIN6);             //单边桥信号输入�
+             -��脚位置6
+ 270   1            pFlash->dbq.modle             =     IapReadByte(FLASH_ADDR_DBQ_MODEL);            //单边桥信号输入�
+             -��式
+ 271   1            pFlash->dbq.rising_ed         =     IapReadByte(FLASH_ADDR_DBQ_RISING_ED);        //单边桥信号输入�
+             -��升沿消抖时间
+ 272   1            pFlash->dbq.falling_ed        =     IapReadByte(FLASH_ADDR_DBQ_FALLING_ED);       //单边桥信号输入�
+             -��降沿消抖时间
+ 273   1            pFlash->dbq.type              =     IapReadByte(FLASH_ADDR_DBQ_TYPE);             //单边桥信号输入传感�
+             -��类型    
+ 274   1            
+ 275   1            //板卡信息 板号board
+ 276   1            pFlash->board.trigger_mode    =     IapReadByte(FLASH_ADDR_TRIGGER_MODE);         //数据触发模式
+ 277   1            pFlash->board.device_type     =     IapReadByte(FLASH_ADDR_DEVICE_TYPE);          //板卡类型
+ 278   1            pFlash->board.number_L        =     IapReadByte(FLASH_ADDR_BOARD_ID_L);           //板号低位
+ 279   1            pFlash->board.number_H        =     IapReadByte(FLASH_ADDR_BOARD_ID_H);           //板号高位
+ 280   1            
+ 281   1      #ifdef  STC15W4K48S4      
+                    //摩托车头盔传感器
+                    pFlash->tk.pin                =       IapReadByte(FLASH_ADDR_TK_PIN);               //摩托车头盔开�
+             -�（压力）输入管脚位置
+                    pFlash->tk.modle              =       IapReadByte(FLASH_ADDR_TK_MODEL);             //摩托车头盔开关�
+             -��压力）输入模式
+                    pFlash->tk.rising_ed          =       IapReadByte(FLASH_ADDR_TK_RISING_ED);         //摩托车头盔开关
+             -（压力）上升沿消抖
+                    pFlash->tk.falling_ed         =       IapReadByte(FLASH_ADDR_TK_FALLING_ED);        //摩托车头盔开关
+             -下降沿消抖
+                    pFlash->tk.type               =       IapReadByte(FLASH_ADDR_TK_TYPE);              //摩托车头盔开关评判�
+             -�型和方式  
+                    
+                    //摩托车左把手传感器
+                    pFlash->zbs.pin               =       IapReadByte(FLASH_ADDR_ZBS_PIN);              //摩托车左把手�
+             -�关（压力）输入管脚位置
+                    pFlash->zbs.modle             =       IapReadByte(FLASH_ADDR_ZBS_MODEL);            //摩托车左把手开
+             -关（压力）输入模式
+                    pFlash->zbs.rising_ed         =       IapReadByte(FLASH_ADDR_ZBS_RISING_ED);        //摩托车左把手�
+             -�关（压力）上升沿消抖
+                    pFlash->zbs.falling_ed        =       IapReadByte(FLASH_ADDR_ZBS_FALLING_ED);       //摩托车左把手开
+             -关下降沿消抖
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 9   
+
+                    pFlash->zbs.type              =       IapReadByte(FLASH_ADDR_ZBS_TYPE);             //摩托车左把手开关评
+             -判类型和方式  
+                    
+                    //摩托车右把手传感器
+                    pFlash->ybs.pin               =       IapReadByte(FLASH_ADDR_YBS_PIN);              //摩托车右把手�
+             -�关（压力）输入管脚位置
+                    pFlash->ybs.modle             =       IapReadByte(FLASH_ADDR_YBS_MODEL);            //摩托车右把手开
+             -关（压力）输入模式
+                    pFlash->ybs.rising_ed         =       IapReadByte(FLASH_ADDR_YBS_RISING_ED);        //摩托车右把手�
+             -�关（压力）上升沿消抖
+                    pFlash->ybs.falling_ed        =       IapReadByte(FLASH_ADDR_YBS_FALLING_ED);       //摩托车右把手开
+             -关下降沿消抖
+                    pFlash->ybs.type              =       IapReadByte(FLASH_ADDR_YBS_TYPE);             //摩托车右把手开关评
+             -判类型和方式  
+                    
+                    //摩托车左踏板传感器
+                    pFlash->zjtb.pin              =       IapReadByte(FLASH_ADDR_ZJTB_PIN);             //摩托车左踏板
+             -开关（压力）输入管脚位置
+                    pFlash->zjtb.modle            =       IapReadByte(FLASH_ADDR_ZJTB_MODEL);           //摩托车左踏板�
+             -�关（压力）输入模式
+                    pFlash->zjtb.rising_ed        =       IapReadByte(FLASH_ADDR_ZJTB_RISING_ED);       //摩托车左踏板�
+             -��关（压力）上升沿消抖
+                    pFlash->zjtb.falling_ed       =       IapReadByte(FLASH_ADDR_ZJTB_FALLING_ED);      //摩托车左踏板�
+             -��关下降沿消抖
+                    pFlash->zjtb.type             =       IapReadByte(FLASH_ADDR_ZJTB_TYPE);            //摩托车左踏板开关评
+             -判类型和方式  
+                    
+                    //摩托车右踏板传感器
+                    pFlash->yjtb.pin              =       IapReadByte(FLASH_ADDR_YJTB_PIN);             //摩托车右踏板
+             -开关（压力）输入管脚位置
+                    pFlash->yjtb.modle            =       IapReadByte(FLASH_ADDR_YJTB_MODEL);           //摩托车右踏板�
+             -�关（压力）输入模式
+                    pFlash->yjtb.rising_ed        =       IapReadByte(FLASH_ADDR_YJTB_RISING_ED);       //摩托车右踏板�
+             -��关（压力）上升沿消抖
+                    pFlash->yjtb.falling_ed       =       IapReadByte(FLASH_ADDR_YJTB_FALLING_ED);      //摩托车右踏板�
+             -��关下降沿消抖
+                    pFlash->yjtb.type             =       IapReadByte(FLASH_ADDR_YJTB_TYPE);            //摩托车右踏板开关评
+             -判类型和方式  
+                    
+                    //碰杆接收
+                    pFlash->pgjs.pin              =       IapReadByte(FLASH_ADDR_PGJS_PIN);             //碰杆项目管脚
+             -位置
+                    pFlash->pgjs.modle            =       IapReadByte(FLASH_ADDR_PGJS_MODEL);           //碰杆项目输入模
+             -式
+                    pFlash->pgjs.rising_ed        =       IapReadByte(FLASH_ADDR_PGJS_RISING_ED);       //碰杆项目上升�
+             -��消抖
+                    pFlash->pgjs.falling_ed       =       IapReadByte(FLASH_ADDR_PGJS_FALLING_ED);      //碰杆项目下降�
+             -��消抖
+                    pFlash->pgjs.type             =       IapReadByte(FLASH_ADDR_PGJS_TYPE);            //碰杆项目评判类型和
+             -方式  
+                    
+                    //碰杆项目1
+                    pFlash->bump[0].name          =       IapReadByte(FLASH_ADDR_PGJS_1_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[0].number        =       IapReadByte(FLASH_ADDR_PGJS_1_N0);            //碰杆项目编号
+                    pFlash->bump[0].count         =       IapReadByte(FLASH_ADDR_PGJS_1_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[0].type          =       IapReadByte(FLASH_ADDR_PGJS_1_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目2
+                    pFlash->bump[1].name          =       IapReadByte(FLASH_ADDR_PGJS_2_NAME);          //碰杆项目名�
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 10  
+
+             -�
+                    pFlash->bump[1].number        =       IapReadByte(FLASH_ADDR_PGJS_2_N0);            //碰杆项目编号
+                    pFlash->bump[1].count         =       IapReadByte(FLASH_ADDR_PGJS_2_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[1].type          =       IapReadByte(FLASH_ADDR_PGJS_2_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目3
+                    pFlash->bump[2].name          =       IapReadByte(FLASH_ADDR_PGJS_3_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[2].number        =       IapReadByte(FLASH_ADDR_PGJS_3_N0);            //碰杆项目编号
+                    pFlash->bump[2].count         =       IapReadByte(FLASH_ADDR_PGJS_3_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[2].type          =       IapReadByte(FLASH_ADDR_PGJS_3_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目4
+                    pFlash->bump[3].name          =       IapReadByte(FLASH_ADDR_PGJS_4_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[3].number        =       IapReadByte(FLASH_ADDR_PGJS_4_N0);            //碰杆项目编号
+                    pFlash->bump[3].count         =       IapReadByte(FLASH_ADDR_PGJS_4_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[3].type          =       IapReadByte(FLASH_ADDR_PGJS_4_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    
+                   //摩托车前手刹
+                    pFlash->qss.pin               =       IapReadByte(FLASH_ADDR_QSS_PIN);              //摩托车前手刹�
+             -�入管脚位置
+                    pFlash->qss.modle             =       IapReadByte(FLASH_ADDR_QSS_MODEL);            //摩托车前手刹输
+             -入模式
+                    pFlash->qss.rising_ed         =       IapReadByte(FLASH_ADDR_QSS_RISING_ED);        //摩托车前手刹�
+             -�升沿消抖
+                    pFlash->qss.falling_ed        =       IapReadByte(FLASH_ADDR_QSS_FALLING_ED);       //摩托车前手刹下
+             -降沿消抖
+                    pFlash->qss.type              =       IapReadByte(FLASH_ADDR_QSS_TYPE);             //摩托车前手刹类型�
+             -�方式  
+                    
+                    //碰杆项目5
+                    pFlash->bump[4].name          =       IapReadByte(FLASH_ADDR_PGJS_5_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[4].number        =       IapReadByte(FLASH_ADDR_PGJS_5_N0);            //碰杆项目编号
+                    pFlash->bump[4].count         =       IapReadByte(FLASH_ADDR_PGJS_5_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[4].type          =       IapReadByte(FLASH_ADDR_PGJS_5_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目6
+                    pFlash->bump[5].name          =       IapReadByte(FLASH_ADDR_PGJS_6_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[5].number        =       IapReadByte(FLASH_ADDR_PGJS_6_N0);            //碰杆项目编号
+                    pFlash->bump[5].count         =       IapReadByte(FLASH_ADDR_PGJS_6_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[5].type          =       IapReadByte(FLASH_ADDR_PGJS_6_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目7
+                    pFlash->bump[6].name          =       IapReadByte(FLASH_ADDR_PGJS_7_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[6].number        =       IapReadByte(FLASH_ADDR_PGJS_7_N0);            //碰杆项目编号
+                    pFlash->bump[6].count         =       IapReadByte(FLASH_ADDR_PGJS_7_COUNT);         //碰杆项目对应杆
+             -的数量
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 11  
+
+                    pFlash->bump[6].type          =       IapReadByte(FLASH_ADDR_PGJS_7_TYPE);          //碰杆项目对应传
+             -感器类型
+                    
+                    //碰杆项目8
+                    pFlash->bump[7].name          =       IapReadByte(FLASH_ADDR_PGJS_8_NAME);          //碰杆项目名�
+             -�
+                    pFlash->bump[7].number        =       IapReadByte(FLASH_ADDR_PGJS_8_N0);            //碰杆项目编号
+                    pFlash->bump[7].count         =       IapReadByte(FLASH_ADDR_PGJS_8_COUNT);         //碰杆项目对应杆
+             -的数量
+                    pFlash->bump[7].type          =       IapReadByte(FLASH_ADDR_PGJS_8_TYPE);          //碰杆项目对应传
+             -感器类型
+                        
+                   //GNSS型号
+                    pFlash->gnss.model            =       IapReadByte(FLASH_ADDR_GNSS_MODEL);           //GNSS型号
+              #endif
+ 383   1      }
+ 384          //========================================================================
+ 385          // 函数: BPS_FlashWriteByte(u16 addr, u8 value)
+ 386          // 描述: 按照字节写入flash，写入前先备份数据
+ 387          // 参数：addr为要写入字节数据的地址，value为字节数据
+ 388          // 版本: V1.0, 2022-10-17
+ 389          //========================================================================
+ 390          void BSP_FlashWriteByte(u16 addr, u8 value)
+ 391          {
+ 392   1      
+ 393   1        BSP_GetFlashConfig();//缓存flash数据
+ 394   1        IapEraseSector(addr);//擦除扇区
+ 395   1        //写入数据
+ 396   1        
+ 397   1        //主板与上位机的连接串口号
+ 398   1        addr == FLASH_ADDR_UPLOAD_COM         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_UPLOAD_COM, FlashC
+             -acheBuf.upload.com);
+ 399   1        addr == FLASH_ADDR_UPLOAD_BOTE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_UPLOAD_BOTE, Flas
+             -hCacheBuf.upload.bote);
+ 400   1        
+ 401   1        //主板与GPS连接串口号
+ 402   1        addr == FLASH_ADDR_GPS_COM            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GPS_COM, FlashCache
+             -Buf.gps.com);
+ 403   1        addr == FLASH_ADDR_GPS_BOTE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GPS_BOTE, FlashCach
+             -eBuf.gps.bote);
+ 404   1        addr == FLASH_ADDR_GPS_COM_REMAP      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GPS_COM_REMAP, F
+             -lashCacheBuf.gps.remap);
+ 405   1        
+ 406   1        //主板与高森碰杆传感器连接的串口
+ 407   1        addr == FLASH_ADDR_BUMP_HS_COM        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BUMP_HS_COM, Flas
+             -hCacheBuf.bump_hs.com);
+ 408   1        addr == FLASH_ADDR_BUMP_HS_BOTE       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BUMP_HS_BOTE, Fla
+             -shCacheBuf.bump_hs.bote);
+ 409   1        
+ 410   1        //主板与2.4G碰杆传感器连接的串口
+ 411   1        addr == FLASH_ADDR_BUMP_24G_COM       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BUMP_24G_COM, Fla
+             -shCacheBuf.bump_24g.com);
+ 412   1        addr == FLASH_ADDR_BUMP_24G_BOTE      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BUMP_24G_BOTE, F
+             -lashCacheBuf.bump_24g.bote);
+ 413   1          
+ 414   1        //主板与倾角连接的串口（汇总后接入）
+ 415   1        addr == FLASH_ADDR_TILT_ALL_COM       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_ALL_COM, Fla
+             -shCacheBuf.titl_all.com);
+ 416   1        addr == FLASH_ADDR_TILT_BOTE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_BOTE, FlashCa
+             -cheBuf.titl_all.bote);
+ 417   1        
+ 418   1        //主板与前轴倾角传感器的连接串口号（单传感器连接）
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 12  
+
+ 419   1        addr == FLASH_ADDR_TILT_Q_COM         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_Q_COM, FlashC
+             -acheBuf.titl_q.com);
+ 420   1        addr == FLASH_ADDR_TILT_BOTE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_BOTE, FlashCa
+             -cheBuf.titl_q.bote);
+ 421   1        
+ 422   1        //主板与后轴倾角传感器的连接串口号（单传感器连接）
+ 423   1        addr == FLASH_ADDR_TILT_H_COM         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_H_COM, FlashC
+             -acheBuf.titl_h.com);
+ 424   1        addr == FLASH_ADDR_TILT_BOTE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_BOTE, FlashCa
+             -cheBuf.titl_h.bote);
+ 425   1        
+ 426   1        //主板与挂轴倾角传感器的连接串口号（单传感器连接）
+ 427   1        addr == FLASH_ADDR_TILT_G_COM         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_G_COM, FlashC
+             -acheBuf.titl_g.com);
+ 428   1        addr == FLASH_ADDR_TILT_BOTE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_BOTE, FlashCa
+             -cheBuf.titl_g.bote);
+ 429   1        
+ 430   1        //主板与二轮摩托车倾角传感器的连接串口号（单传感器连接）
+ 431   1        addr == FLASH_ADDR_TILT_MTC_COM       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_MTC_COM, Fla
+             -shCacheBuf.titl_mtc.com);
+ 432   1        addr == FLASH_ADDR_TILT_BOTE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TILT_BOTE, FlashCa
+             -cheBuf.titl_mtc.bote);
+ 433   1        
+ 434   1        //主板网口模块
+ 435   1        addr == FLASH_ADDR_NETWORK_COM        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NETWORK_COM, Flas
+             -hCacheBuf.network.com);
+ 436   1        
+ 437   1        
+ 438   1        //主板与超声波（单边桥）传感器的连接串口号
+ 439   1        addr == FLASH_ADDR_CSB_DBQ_COM        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CSB_DBQ_COM, Flas
+             -hCacheBuf.csb_dbq.com);
+ 440   1        addr == FLASH_ADDR_CSB_DBQ_BOTE       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CSB_DBQ_BOTE, Fla
+             -shCacheBuf.csb_dbq.bote);
+ 441   1        
+ 442   1        //主板与超声波（隧道）传感器的连接串口号
+ 443   1        addr == FLASH_ADDR_CSB_SD_COM         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CSB_SD_COM, FlashC
+             -acheBuf.csb_sd.com);
+ 444   1        addr == FLASH_ADDR_CSB_SD_BOTE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CSB_SD_BOTE, Flas
+             -hCacheBuf.csb_sd.bote);
+ 445   1        
+ 446   1      
+ 447   1        //座椅开关（调节）
+ 448   1        addr == FLASH_ADDR_ZYTJ_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYTJ_PIN, FlashCach
+             -eBuf.zytj.pin);
+ 449   1        addr == FLASH_ADDR_ZYTJ_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYTJ_MODEL,FlashCa
+             -cheBuf.zytj.modle);
+ 450   1        addr == FLASH_ADDR_ZYTJ_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYTJ_RISING_ED,F
+             -lashCacheBuf.zytj.rising_ed);
+ 451   1        addr == FLASH_ADDR_ZYTJ_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYTJ_FALLING_ED
+             -,FlashCacheBuf.zytj.falling_ed);
+ 452   1        addr == FLASH_ADDR_ZYTJ_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYTJ_TYPE, FlashCa
+             -cheBuf.zytj.type);
+ 453   1        //手刹开关
+ 454   1        addr == FLASH_ADDR_SS_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SS_PIN, FlashCacheBu
+             -f.ss.pin);
+ 455   1        addr == FLASH_ADDR_SS_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SS_MODEL,FlashCache
+             -Buf.ss.modle);
+ 456   1        addr == FLASH_ADDR_SS_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SS_RISING_ED,Flas
+             -hCacheBuf.ss.rising_ed);
+ 457   1        addr == FLASH_ADDR_SS_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SS_FALLING_ED, F
+             -lashCacheBuf.ss.falling_ed);
+ 458   1        addr == FLASH_ADDR_SS_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SS_TYPE, FlashCache
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 13  
+
+             -Buf.ss.type);
+ 459   1        //左转开关
+ 460   1        addr == FLASH_ADDR_ZZ_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZZ_PIN, FlashCacheBu
+             -f.zz.pin);
+ 461   1        addr == FLASH_ADDR_ZZ_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZZ_MODEL,FlashCache
+             -Buf.zz.modle);
+ 462   1        addr == FLASH_ADDR_ZZ_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZZ_RISING_ED,Flas
+             -hCacheBuf.zz.rising_ed);
+ 463   1        addr == FLASH_ADDR_ZZ_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZZ_FALLING_ED, F
+             -lashCacheBuf.zz.falling_ed);
+ 464   1        addr == FLASH_ADDR_ZZ_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZZ_TYPE, FlashCache
+             -Buf.zz.type);
+ 465   1        //右转开关
+ 466   1        addr == FLASH_ADDR_YZ_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YZ_PIN, FlashCacheBu
+             -f.yz.pin);
+ 467   1        addr == FLASH_ADDR_YZ_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YZ_MODEL,FlashCache
+             -Buf.yz.modle);
+ 468   1        addr == FLASH_ADDR_YZ_RISING_ED         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YZ_RISING_ED,Fla
+             -shCacheBuf.yz.rising_ed);
+ 469   1        addr == FLASH_ADDR_YZ_FALLING_ED        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YZ_FALLING_ED, 
+             -FlashCacheBuf.yz.falling_ed);
+ 470   1        addr == FLASH_ADDR_YZ_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YZ_TYPE, FlashCache
+             -Buf.yz.type);
+ 471   1        //远光开关
+ 472   1        addr == FLASH_ADDR_YG_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YG_PIN, FlashCacheBu
+             -f.yg.pin);
+ 473   1        addr == FLASH_ADDR_YG_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YG_MODEL,FlashCache
+             -Buf.yg.modle);
+ 474   1        addr == FLASH_ADDR_YG_RISING_ED         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YG_RISING_ED,Fla
+             -shCacheBuf.yg.rising_ed);
+ 475   1        addr == FLASH_ADDR_YG_FALLING_ED        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YG_FALLING_ED, 
+             -FlashCacheBuf.yg.falling_ed);
+ 476   1        addr == FLASH_ADDR_YG_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YG_TYPE, FlashCache
+             -Buf.yg.type);
+ 477   1        //近光开关
+ 478   1        addr == FLASH_ADDR_JG_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JG_PIN, FlashCacheBu
+             -f.jg.pin);
+ 479   1        addr == FLASH_ADDR_JG_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JG_MODEL,FlashCache
+             -Buf.jg.modle);
+ 480   1        addr == FLASH_ADDR_JG_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JG_RISING_ED,Flas
+             -hCacheBuf.jg.rising_ed);
+ 481   1        addr == FLASH_ADDR_JG_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JG_FALLING_ED, F
+             -lashCacheBuf.jg.falling_ed);
+ 482   1        addr == FLASH_ADDR_JG_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JG_TYPE, FlashCache
+             -Buf.jg.type);
+ 483   1        //离合开关
+ 484   1        addr == FLASH_ADDR_LH_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LH_PIN, FlashCacheBu
+             -f.lh.pin);
+ 485   1        addr == FLASH_ADDR_LH_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LH_MODEL,FlashCache
+             -Buf.lh.modle);
+ 486   1        addr == FLASH_ADDR_LH_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LH_RISING_ED,Flas
+             -hCacheBuf.lh.rising_ed);
+ 487   1        addr == FLASH_ADDR_LH_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LH_FALLING_ED, F
+             -lashCacheBuf.lh.falling_ed);
+ 488   1        addr == FLASH_ADDR_LH_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LH_TYPE, FlashCache
+             -Buf.lh.type);
+ 489   1        //脚刹开关
+ 490   1        addr == FLASH_ADDR_JS_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JS_PIN, FlashCacheBu
+             -f.js.pin);
+ 491   1        addr == FLASH_ADDR_JS_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JS_MODEL,FlashCache
+             -Buf.js.modle);
+ 492   1        addr == FLASH_ADDR_JS_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JS_RISING_ED,Flas
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 14  
+
+             -hCacheBuf.js.rising_ed);
+ 493   1        addr == FLASH_ADDR_JS_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JS_FALLING_ED, F
+             -lashCacheBuf.js.falling_ed);
+ 494   1        addr == FLASH_ADDR_JS_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_JS_TYPE, FlashCache
+             -Buf.js.type);
+ 495   1        //熄火开关
+ 496   1        addr == FLASH_ADDR_XH_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XH_PIN, FlashCacheBu
+             -f.xh.pin);
+ 497   1        addr == FLASH_ADDR_XH_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XH_MODEL,FlashCache
+             -Buf.xh.modle);
+ 498   1        addr == FLASH_ADDR_XH_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XH_RISING_ED,Flas
+             -hCacheBuf.xh.rising_ed);
+ 499   1        addr == FLASH_ADDR_XH_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XH_FALLING_ED, F
+             -lashCacheBuf.xh.falling_ed);
+ 500   1        addr == FLASH_ADDR_XH_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XH_TYPE, FlashCache
+             -Buf.xh.type);
+ 501   1        //启动开关
+ 502   1        addr == FLASH_ADDR_QD_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QD_PIN, FlashCacheBu
+             -f.qd.pin);
+ 503   1        addr == FLASH_ADDR_QD_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QD_MODEL,FlashCache
+             -Buf.qd.modle);
+ 504   1        addr == FLASH_ADDR_QD_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QD_RISING_ED,Flas
+             -hCacheBuf.qd.rising_ed);
+ 505   1        addr == FLASH_ADDR_QD_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QD_FALLING_ED, F
+             -lashCacheBuf.qd.falling_ed);
+ 506   1        addr == FLASH_ADDR_QD_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QD_TYPE, FlashCache
+             -Buf.qd.type);
+ 507   1        //安全带开关
+ 508   1        addr == FLASH_ADDR_AQD_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_AQD_PIN, FlashCache
+             -Buf.aqd.pin);
+ 509   1        addr == FLASH_ADDR_AQD_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_AQD_MODEL,FlashCac
+             -heBuf.aqd.modle);
+ 510   1        addr == FLASH_ADDR_AQD_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_AQD_RISING_ED,Fl
+             -ashCacheBuf.aqd.rising_ed);
+ 511   1        addr == FLASH_ADDR_AQD_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_AQD_FALLING_ED,  
+             -FlashCacheBuf.aqd.falling_ed);
+ 512   1        addr == FLASH_ADDR_AQD_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_AQD_TYPE,  FlashCach
+             -eBuf.aqd.type);
+ 513   1        //示警开关
+ 514   1        addr == FLASH_ADDR_SJ_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SJ_PIN, FlashCacheBu
+             -f.sj.pin);
+ 515   1        addr == FLASH_ADDR_SJ_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SJ_MODEL,FlashCache
+             -Buf.sj.modle);
+ 516   1        addr == FLASH_ADDR_SJ_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SJ_RISING_ED,Flas
+             -hCacheBuf.sj.rising_ed);
+ 517   1        addr == FLASH_ADDR_SJ_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SJ_FALLING_ED, Fl
+             -ashCacheBuf.sj.falling_ed);
+ 518   1        addr == FLASH_ADDR_SJ_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_SJ_TYPE, FlashCach
+             -eBuf.sj.type);
+ 519   1        //小灯开关
+ 520   1        addr == FLASH_ADDR_XD_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XD_PIN, FlashCacheBu
+             -f.xd.pin);
+ 521   1        addr == FLASH_ADDR_XD_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XD_MODEL,FlashCache
+             -Buf.xd.modle);
+ 522   1        addr == FLASH_ADDR_XD_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XD_RISING_ED,Flas
+             -hCacheBuf.xd.rising_ed);
+ 523   1        addr == FLASH_ADDR_XD_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XD_FALLING_ED, Fl
+             -ashCacheBuf.xd.falling_ed);
+ 524   1        addr == FLASH_ADDR_XD_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_XD_TYPE, FlashCache
+             -Buf.xd.type);
+ 525   1        //喇叭开关
+ 526   1        addr == FLASH_ADDR_LB_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LB_PIN, FlashCacheBu
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 15  
+
+             -f.lb.pin);
+ 527   1        addr == FLASH_ADDR_LB_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LB_MODEL,FlashCache
+             -Buf.lb.modle);
+ 528   1        addr == FLASH_ADDR_LB_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LB_RISING_ED,Flas
+             -hCacheBuf.lb.rising_ed);
+ 529   1        addr == FLASH_ADDR_LB_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LB_FALLING_ED, Fl
+             -ashCacheBuf.lb.falling_ed);
+ 530   1        addr == FLASH_ADDR_LB_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LB_TYPE, FlashCache
+             -Buf.lb.type);
+ 531   1        //车门开关
+ 532   1        addr == FLASH_ADDR_CM_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CM_PIN, FlashCacheBu
+             -f.cm.pin);
+ 533   1        addr == FLASH_ADDR_CM_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CM_MODEL,FlashCache
+             -Buf.cm.modle);
+ 534   1        addr == FLASH_ADDR_CM_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CM_RISING_ED,Flas
+             -hCacheBuf.cm.rising_ed);
+ 535   1        addr == FLASH_ADDR_CM_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CM_FALLING_ED, Fl
+             -ashCacheBuf.cm.falling_ed);
+ 536   1        addr == FLASH_ADDR_CM_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CM_TYPE, FlashCache
+             -Buf.cm.type);
+ 537   1        //挡位传感器
+ 538   1        addr == FLASH_ADDR_DW_PIN1            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_PIN1,FlashCacheB
+             -uf.dw.pin1);
+ 539   1        addr == FLASH_ADDR_DW_PIN2            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_PIN2,FlashCacheB
+             -uf.dw.pin2);
+ 540   1        addr == FLASH_ADDR_DW_PIN3            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_PIN3,FlashCacheB
+             -uf.dw.pin3);
+ 541   1        addr == FLASH_ADDR_DW_PIN4            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_PIN4,FlashCacheB
+             -uf.dw.pin4);
+ 542   1        addr == FLASH_ADDR_DW_PIN5            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_PIN5,FlashCacheB
+             -uf.dw.pin5);
+ 543   1        addr == FLASH_ADDR_DW_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_MODEL,FlashCache
+             -Buf.dw.modle);
+ 544   1        addr == FLASH_ADDR_DW_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_RISING_ED,Flas
+             -hCacheBuf.dw.rising_ed);
+ 545   1        addr == FLASH_ADDR_DW_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_FALLING_ED,Fla
+             -shCacheBuf.dw.falling_ed);
+ 546   1        addr == FLASH_ADDR_DW_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_TYPE,FlashCacheBu
+             -f.dw.type);
+ 547   1        addr == FLASH_ADDR_DW_VALUE_1         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_1,FlashCa
+             -cheBuf.dw.value[0]);
+ 548   1        addr == FLASH_ADDR_DW_VALUE_2         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_2,FlashCa
+             -cheBuf.dw.value[1]);
+ 549   1        addr == FLASH_ADDR_DW_VALUE_3         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_3,FlashCa
+             -cheBuf.dw.value[2]);
+ 550   1        addr == FLASH_ADDR_DW_VALUE_4         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_4,FlashCa
+             -cheBuf.dw.value[3]);
+ 551   1        addr == FLASH_ADDR_DW_VALUE_5         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_5,FlashCa
+             -cheBuf.dw.value[4]);
+ 552   1        addr == FLASH_ADDR_DW_VALUE_R         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_R,FlashCa
+             -cheBuf.dw.value[5]);
+ 553   1        addr == FLASH_ADDR_DW_VALUE_ZERO      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DW_VALUE_ZERO,Fla
+             -shCacheBuf.dw.value[6]);
+ 554   1      
+ 555   1        //左后视开关
+ 556   1        addr == FLASH_ADDR_ZHS_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZHS_PIN, FlashCache
+             -Buf.zhs.pin);
+ 557   1        addr == FLASH_ADDR_ZHS_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZHS_MODEL,FlashCac
+             -heBuf.zhs.modle);
+ 558   1        addr == FLASH_ADDR_ZHS_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZHS_RISING_ED,Fl
+             -ashCacheBuf.zhs.rising_ed);
+ 559   1        addr == FLASH_ADDR_ZHS_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZHS_FALLING_ED,  
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 16  
+
+             -FlashCacheBuf.zhs.falling_ed);
+ 560   1        addr == FLASH_ADDR_ZHS_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZHS_TYPE,  FlashCach
+             -eBuf.zhs.type);
+ 561   1        //内后视开关
+ 562   1        addr == FLASH_ADDR_NHS_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NHS_PIN, FlashCache
+             -Buf.nhs.pin);
+ 563   1        addr == FLASH_ADDR_NHS_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NHS_MODEL,FlashCac
+             -heBuf.nhs.modle);
+ 564   1        addr == FLASH_ADDR_NHS_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NHS_RISING_ED,Fl
+             -ashCacheBuf.nhs.rising_ed);
+ 565   1        addr == FLASH_ADDR_NHS_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NHS_FALLING_ED,  
+             -FlashCacheBuf.nhs.falling_ed);
+ 566   1        addr == FLASH_ADDR_NHS_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_NHS_TYPE,  FlashCach
+             -eBuf.nhs.type);
+ 567   1        //副刹开关
+ 568   1        addr == FLASH_ADDR_FSC_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_FSC_PIN, FlashCache
+             -Buf.fsc.pin);
+ 569   1        addr == FLASH_ADDR_FSC_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_FSC_MODEL,FlashCac
+             -heBuf.fsc.modle);
+ 570   1        addr == FLASH_ADDR_FSC_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_FSC_RISING_ED,Fl
+             -ashCacheBuf.fsc.rising_ed);
+ 571   1        addr == FLASH_ADDR_FSC_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_FSC_FALLING_ED,  
+             -FlashCacheBuf.fsc.falling_ed);
+ 572   1        addr == FLASH_ADDR_FSC_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_FSC_TYPE,  FlashCach
+             -eBuf.fsc.type);
+ 573   1        //雾灯开关
+ 574   1        addr == FLASH_ADDR_WD_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_WD_PIN, FlashCacheBu
+             -f.wd.pin);
+ 575   1        addr == FLASH_ADDR_WD_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_WD_MODEL,FlashCache
+             -Buf.wd.modle);
+ 576   1        addr == FLASH_ADDR_WD_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_WD_RISING_ED,Flas
+             -hCacheBuf.wd.rising_ed);
+ 577   1        addr == FLASH_ADDR_WD_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_WD_FALLING_ED, Fl
+             -ashCacheBuf.wd.falling_ed);
+ 578   1        addr == FLASH_ADDR_WD_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_WD_TYPE, FlashCache
+             -Buf.wd.type);
+ 579   1        //雨刷开关
+ 580   1        addr == FLASH_ADDR_YS_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YS_PIN, FlashCacheBu
+             -f.ys.pin);
+ 581   1        addr == FLASH_ADDR_YS_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YS_MODEL,FlashCache
+             -Buf.ys.modle);
+ 582   1        addr == FLASH_ADDR_YS_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YS_RISING_ED,Flas
+             -hCacheBuf.ys.rising_ed);
+ 583   1        addr == FLASH_ADDR_YS_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YS_FALLING_ED, Fl
+             -ashCacheBuf.ys.falling_ed);
+ 584   1        addr == FLASH_ADDR_YS_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YS_TYPE, FlashCache
+             -Buf.ys.type);
+ 585   1        //倒车灯开关
+ 586   1        addr == FLASH_ADDR_DCD_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DCD_PIN, FlashCache
+             -Buf.dcd.pin);
+ 587   1        addr == FLASH_ADDR_DCD_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DCD_MODEL,FlashCac
+             -heBuf.dcd.modle);
+ 588   1        addr == FLASH_ADDR_DCD_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DCD_RISING_ED,Fl
+             -ashCacheBuf.dcd.rising_ed);
+ 589   1        addr == FLASH_ADDR_DCD_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DCD_FALLING_ED,  
+             -FlashCacheBuf.dcd.falling_ed);
+ 590   1        addr == FLASH_ADDR_DCD_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DCD_TYPE,  FlashCach
+             -eBuf.dcd.type);
+ 591   1        //钥匙门开关
+ 592   1        addr == FLASH_ADDR_YSM_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YSM_PIN, FlashCache
+             -Buf.ysm.pin);
+ 593   1        addr == FLASH_ADDR_YSM_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YSM_MODEL,FlashCac
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 17  
+
+             -heBuf.ysm.modle);
+ 594   1        addr == FLASH_ADDR_YSM_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YSM_RISING_ED,Fl
+             -ashCacheBuf.ysm.rising_ed);
+ 595   1        addr == FLASH_ADDR_YSM_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YSM_FALLING_ED,  
+             -FlashCacheBuf.ysm.falling_ed);
+ 596   1        addr == FLASH_ADDR_YSM_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YSM_TYPE,  FlashCach
+             -eBuf.ysm.type);
+ 597   1        //绕车开关1
+ 598   1        addr == FLASH_ADDR_RC_PIN1            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_PIN1,FlashCacheB
+             -uf.rc.pin1);
+ 599   1        addr == FLASH_ADDR_RC_PIN2            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_PIN2,FlashCacheB
+             -uf.rc.pin2);
+ 600   1        addr == FLASH_ADDR_RC_PIN3            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_PIN3,FlashCacheB
+             -uf.rc.pin3);
+ 601   1        addr == FLASH_ADDR_RC_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_MODEL,FlashCache
+             -Buf.rc.modle);
+ 602   1        addr == FLASH_ADDR_RC_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_RISING_ED,Flas
+             -hCacheBuf.rc.rising_ed);
+ 603   1        addr == FLASH_ADDR_RC_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_FALLING_ED, Fl
+             -ashCacheBuf.rc.falling_ed);
+ 604   1        addr == FLASH_ADDR_RC_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_RC_TYPE, FlashCacheB
+             -uf.rc.type);
+ 605   1        //闯动开关
+ 606   1        addr == FLASH_ADDR_CD_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CD_PIN, FlashCacheBu
+             -f.cd.pin);
+ 607   1        addr == FLASH_ADDR_CD_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CD_MODEL,FlashCache
+             -Buf.cd.modle);
+ 608   1        addr == FLASH_ADDR_CD_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CD_RISING_ED,Flas
+             -hCacheBuf.cd.rising_ed);
+ 609   1        addr == FLASH_ADDR_CD_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CD_FALLING_ED, Fl
+             -ashCacheBuf.cd.falling_ed);
+ 610   1        addr == FLASH_ADDR_CD_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_CD_TYPE, FlashCache
+             -Buf.cd.type);
+ 611   1        //座椅开关（压力)
+ 612   1        addr == FLASH_ADDR_ZYYL_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYYL_PIN, FlashCach
+             -eBuf.zyyl.pin);
+ 613   1        addr == FLASH_ADDR_ZYYL_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYYL_MODEL,FlashCa
+             -cheBuf.zyyl.modle);
+ 614   1        addr == FLASH_ADDR_ZYYL_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYYL_RISING_ED,F
+             -lashCacheBuf.zyyl.rising_ed);
+ 615   1        addr == FLASH_ADDR_ZYYL_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYYL_FALLING_ED,
+             -  FlashCacheBuf.zyyl.falling_ed);
+ 616   1        addr == FLASH_ADDR_ZYYL_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZYYL_TYPE, FlashCa
+             -cheBuf.zyyl.type);
+ 617   1        
+ 618   1        //里程计数
+ 619   1        addr == FLASH_ADDR_LCJS_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LCJS_PIN, FlashCach
+             -eBuf.lc.pin);
+ 620   1        addr == FLASH_ADDR_LCJS_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LCJS_MODEL,FlashCa
+             -cheBuf.lc.modle);
+ 621   1        addr == FLASH_ADDR_LCJS_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LCJS_RISING_ED,F
+             -lashCacheBuf.lc.rising_ed);
+ 622   1        addr == FLASH_ADDR_LCJS_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LCJS_FALLING_ED,
+             -  FlashCacheBuf.lc.falling_ed);
+ 623   1        addr == FLASH_ADDR_LCJS_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_LCJS_TYPE, FlashCa
+             -cheBuf.lc.type);
+ 624   1        
+ 625   1        //观察仪表盘
+ 626   1        addr == FLASH_ADDR_GCYBP_PIN          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GCYBP_PIN, FlashCac
+             -heBuf.gcybp.pin);
+ 627   1        addr == FLASH_ADDR_GCYBP_MODEL        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GCYBP_MODEL,FlashC
+             -acheBuf.gcybp.modle);
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 18  
+
+ 628   1        addr == FLASH_ADDR_GCYBP_RISING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GCYBP_RISING_ED,
+             -FlashCacheBuf.gcybp.rising_ed);
+ 629   1        addr == FLASH_ADDR_GCYBP_FALLING_ED   ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GCYBP_FALLING_E
+             -D,  FlashCacheBuf.gcybp.falling_ed);
+ 630   1        addr == FLASH_ADDR_GCYBP_TYPE         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GCYBP_TYPE,  FlashC
+             -acheBuf.gcybp.type);
+ 631   1        
+ 632   1        
+ 633   1        //触发开始考试信号
+ 634   1        addr == FLASH_ADDR_BEGIN_PIN          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BEGIN_PIN, FlashCac
+             -heBuf.begin.pin);
+ 635   1        addr == FLASH_ADDR_BEGIN_MODEL        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BEGIN_MODEL,FlashC
+             -acheBuf.begin.modle);
+ 636   1        addr == FLASH_ADDR_BEGIN_RISING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BEGIN_RISING_ED,
+             -FlashCacheBuf.begin.rising_ed);
+ 637   1        addr == FLASH_ADDR_BEGIN_FALLING_ED   ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BEGIN_FALLING_E
+             -D,  FlashCacheBuf.begin.falling_ed);
+ 638   1        addr == FLASH_ADDR_BEGIN_TYPE         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BEGIN_TYPE,  FlashC
+             -acheBuf.begin.type);
+ 639   1        
+ 640   1        //转速
+ 641   1        addr == FLASH_ADDR_ZS_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_PIN, FlashCacheBu
+             -f.zs.pin);
+ 642   1        addr == FLASH_ADDR_ZS_IDLIN_MIN       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_IDLIN_MIN,Flas
+             -hCacheBuf.zs.min);
+ 643   1        addr == FLASH_ADDR_ZS_XH_MAX          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_XH_MAX,FlashCach
+             -eBuf.zs.max);
+ 644   1        addr == FLASH_ADDR_ZS_BS              ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_BS,FlashCacheBuf.z
+             -s.bs);
+ 645   1        addr == FLASH_ADDR_ZS_SAMPLING_TIME   ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_SAMPLING_TIM
+             -E,FlashCacheBuf.zs.sampling_time);
+ 646   1        addr == FLASH_ADDR_ZS_INIT_VALUE      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZS_INIT_VALUE, Fl
+             -ashCacheBuf.zs.init_value); 
+ 647   1      
+ 648   1        //单边桥传感器
+ 649   1        addr == FLASH_ADDR_DBQ_PIN1           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN1,FlashCache
+             -Buf.dbq.pin1);
+ 650   1        addr == FLASH_ADDR_DBQ_PIN2           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN2,FlashCache
+             -Buf.dbq.pin2);
+ 651   1        addr == FLASH_ADDR_DBQ_PIN3           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN3,FlashCache
+             -Buf.dbq.pin3);
+ 652   1        addr == FLASH_ADDR_DBQ_PIN4           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN4,FlashCache
+             -Buf.dbq.pin4);
+ 653   1        addr == FLASH_ADDR_DBQ_PIN5           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN5,FlashCache
+             -Buf.dbq.pin5);  
+ 654   1        addr == FLASH_ADDR_DBQ_PIN6           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_PIN6,FlashCache
+             -Buf.dbq.pin6);
+ 655   1        addr == FLASH_ADDR_DBQ_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_MODEL,FlashCach
+             -eBuf.dbq.modle);
+ 656   1        addr == FLASH_ADDR_DBQ_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_RISING_ED,Fla
+             -shCacheBuf.dbq.rising_ed);
+ 657   1        addr == FLASH_ADDR_DBQ_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_FALLING_ED,
+             -  FlashCacheBuf.dbq.falling_ed);
+ 658   1        addr == FLASH_ADDR_DBQ_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DBQ_TYPE,  FlashCach
+             -eBuf.dbq.type); 
+ 659   1        
+ 660   1        
+ 661   1        //板卡信息 板号board
+ 662   1        addr == FLASH_ADDR_TRIGGER_MODE       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TRIGGER_MODE, Fla
+             -shCacheBuf.board.trigger_mode);
+ 663   1        addr == FLASH_ADDR_DEVICE_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_DEVICE_TYPE, Flash
+             -CacheBuf.board.device_type);
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 19  
+
+ 664   1        addr == FLASH_ADDR_BOARD_ID_L         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BOARD_ID_L, FlashC
+             -acheBuf.board.number_L);
+ 665   1        addr == FLASH_ADDR_BOARD_ID_H         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_BOARD_ID_H, FlashC
+             -acheBuf.board.number_H);
+ 666   1        
+ 667   1      #ifdef  STC15W4K48S4  
+                //摩托车头盔
+                addr == FLASH_ADDR_TK_PIN             ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TK_PIN, FlashCacheBu
+             -f.tk.pin);
+                addr == FLASH_ADDR_TK_MODEL           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TK_MODEL,FlashCache
+             -Buf.tk.modle);
+                addr == FLASH_ADDR_TK_RISING_ED       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TK_RISING_ED,Flas
+             -hCacheBuf.tk.rising_ed);
+                addr == FLASH_ADDR_TK_FALLING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TK_FALLING_ED, Fl
+             -ashCacheBuf.tk.falling_ed);
+                addr == FLASH_ADDR_TK_TYPE            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_TK_TYPE, FlashCache
+             -Buf.tk.type);
+                
+                //摩托车左把手
+                addr == FLASH_ADDR_ZBS_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZBS_PIN, FlashCacheB
+             -uf.zbs.pin);
+                addr == FLASH_ADDR_ZBS_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZBS_MODEL,FlashCach
+             -eBuf.zbs.modle);
+                addr == FLASH_ADDR_ZBS_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZBS_RISING_ED,Fla
+             -shCacheBuf.zbs.rising_ed);
+                addr == FLASH_ADDR_ZBS_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZBS_FALLING_ED,  
+             -FlashCacheBuf.zbs.falling_ed);
+                addr == FLASH_ADDR_ZBS_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZBS_TYPE,  FlashCach
+             -eBuf.zbs.type);
+                
+                //摩托车右把手
+                addr == FLASH_ADDR_YBS_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YBS_PIN, FlashCacheB
+             -uf.ybs.pin);
+                addr == FLASH_ADDR_YBS_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YBS_MODEL,FlashCach
+             -eBuf.ybs.modle);
+                addr == FLASH_ADDR_YBS_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YBS_RISING_ED,Fla
+             -shCacheBuf.ybs.rising_ed);
+                addr == FLASH_ADDR_YBS_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YBS_FALLING_ED,  
+             -FlashCacheBuf.ybs.falling_ed);
+                addr == FLASH_ADDR_YBS_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YBS_TYPE,  FlashCach
+             -eBuf.ybs.type);
+                
+                //摩托车左脚踏板
+                addr == FLASH_ADDR_ZJTB_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZJTB_PIN, FlashCach
+             -eBuf.zjtb.pin);
+                addr == FLASH_ADDR_ZJTB_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZJTB_MODEL,FlashCa
+             -cheBuf.zjtb.modle);
+                addr == FLASH_ADDR_ZJTB_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZJTB_RISING_ED,F
+             -lashCacheBuf.zjtb.rising_ed);
+                addr == FLASH_ADDR_ZJTB_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZJTB_FALLING_ED,
+             -  FlashCacheBuf.zjtb.falling_ed);
+                addr == FLASH_ADDR_ZJTB_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_ZJTB_TYPE, FlashCa
+             -cheBuf.zjtb.type);
+                
+                //摩托车右脚踏板
+                addr == FLASH_ADDR_YJTB_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YJTB_PIN, FlashCach
+             -eBuf.yjtb.pin);
+                addr == FLASH_ADDR_YJTB_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YJTB_MODEL,FlashCa
+             -cheBuf.yjtb.modle);
+                addr == FLASH_ADDR_YJTB_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YJTB_RISING_ED,F
+             -lashCacheBuf.yjtb.rising_ed);
+                addr == FLASH_ADDR_YJTB_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YJTB_FALLING_ED,
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 20  
+
+             -  FlashCacheBuf.yjtb.falling_ed);
+                addr == FLASH_ADDR_YJTB_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_YJTB_TYPE, FlashCa
+             -cheBuf.yjtb.type);
+                
+                //碰杆接收
+                addr == FLASH_ADDR_PGJS_PIN           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_PIN, FlashCach
+             -eBuf.pgjs.pin);
+                addr == FLASH_ADDR_PGJS_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_MODEL,FlashCa
+             -cheBuf.pgjs.modle);
+                addr == FLASH_ADDR_PGJS_RISING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_RISING_ED,F
+             -lashCacheBuf.pgjs.rising_ed);
+                addr == FLASH_ADDR_PGJS_FALLING_ED    ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_FALLING_ED,
+             -  FlashCacheBuf.pgjs.falling_ed);
+                addr == FLASH_ADDR_PGJS_TYPE          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_TYPE, FlashCa
+             -cheBuf.pgjs.type);
+              
+                //碰杆项目1
+                addr == FLASH_ADDR_PGJS_1_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_1_NAME, Flash
+             -CacheBuf.bump[0].name);
+                addr == FLASH_ADDR_PGJS_1_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_1_N0,FlashCach
+             -eBuf.bump[0].number);
+                addr == FLASH_ADDR_PGJS_1_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_1_COUNT,Flas
+             -hCacheBuf.bump[0].count);
+                addr == FLASH_ADDR_PGJS_1_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_1_TYPE,FlashC
+             -acheBuf.bump[0].type);
+                
+                //碰杆项目2
+                addr == FLASH_ADDR_PGJS_2_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_2_NAME, Flash
+             -CacheBuf.bump[1].name);
+                addr == FLASH_ADDR_PGJS_2_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_2_N0,FlashCach
+             -eBuf.bump[1].number);
+                addr == FLASH_ADDR_PGJS_2_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_2_COUNT,Flas
+             -hCacheBuf.bump[1].count);
+                addr == FLASH_ADDR_PGJS_2_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_2_TYPE,FlashC
+             -acheBuf.bump[1].type);
+                
+                //碰杆项目3
+                addr == FLASH_ADDR_PGJS_3_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_3_NAME, Flash
+             -CacheBuf.bump[2].name);
+                addr == FLASH_ADDR_PGJS_3_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_3_N0,FlashCach
+             -eBuf.bump[2].number);
+                addr == FLASH_ADDR_PGJS_3_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_3_COUNT,Flas
+             -hCacheBuf.bump[2].count);
+                addr == FLASH_ADDR_PGJS_3_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_3_TYPE,FlashC
+             -acheBuf.bump[2].type);
+                
+                //碰杆项目4
+                addr == FLASH_ADDR_PGJS_4_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_4_NAME, Flash
+             -CacheBuf.bump[3].name);
+                addr == FLASH_ADDR_PGJS_4_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_4_N0,FlashCach
+             -eBuf.bump[3].number);
+                addr == FLASH_ADDR_PGJS_4_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_4_COUNT,Flas
+             -hCacheBuf.bump[3].count);
+                addr == FLASH_ADDR_PGJS_4_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_4_TYPE,FlashC
+             -acheBuf.bump[3].type);
+                
+                  //摩托车前手刹
+                addr == FLASH_ADDR_QSS_PIN            ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QSS_PIN, FlashCacheB
+             -uf.qss.pin);
+                addr == FLASH_ADDR_QSS_MODEL          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QSS_MODEL,FlashCach
+             -eBuf.qss.modle);
+                addr == FLASH_ADDR_QSS_RISING_ED      ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QSS_RISING_ED,Fla
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 21  
+
+             -shCacheBuf.qss.rising_ed);
+                addr == FLASH_ADDR_QSS_FALLING_ED     ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QSS_FALLING_ED,  
+             -FlashCacheBuf.qss.falling_ed);
+                addr == FLASH_ADDR_QSS_TYPE           ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_QSS_TYPE,  FlashCach
+             -eBuf.qss.type);
+                
+                //碰杆项目5
+                addr == FLASH_ADDR_PGJS_5_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_5_NAME, Flash
+             -CacheBuf.bump[4].name);
+                addr == FLASH_ADDR_PGJS_5_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_5_N0,FlashCach
+             -eBuf.bump[4].number);
+                addr == FLASH_ADDR_PGJS_5_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_5_COUNT,Flas
+             -hCacheBuf.bump[4].count);
+                addr == FLASH_ADDR_PGJS_5_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_5_TYPE,FlashC
+             -acheBuf.bump[4].type);
+                
+                //碰杆项目6
+                addr == FLASH_ADDR_PGJS_6_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_6_NAME, Flash
+             -CacheBuf.bump[5].name);
+                addr == FLASH_ADDR_PGJS_6_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_6_N0,FlashCach
+             -eBuf.bump[5].number);
+                addr == FLASH_ADDR_PGJS_6_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_6_COUNT,Flas
+             -hCacheBuf.bump[5].count);
+                addr == FLASH_ADDR_PGJS_6_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_6_TYPE,FlashC
+             -acheBuf.bump[5].type);
+                
+                //碰杆项目7
+                addr == FLASH_ADDR_PGJS_7_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_7_NAME, Flash
+             -CacheBuf.bump[6].name);
+                addr == FLASH_ADDR_PGJS_7_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_7_N0,FlashCach
+             -eBuf.bump[6].number);
+                addr == FLASH_ADDR_PGJS_7_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_7_COUNT,Flas
+             -hCacheBuf.bump[6].count);
+                addr == FLASH_ADDR_PGJS_7_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_7_TYPE,FlashC
+             -acheBuf.bump[6].type);
+                
+                //碰杆项目8
+                addr == FLASH_ADDR_PGJS_8_NAME        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_8_NAME, Flash
+             -CacheBuf.bump[7].name);
+                addr == FLASH_ADDR_PGJS_8_N0          ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_8_N0,FlashCach
+             -eBuf.bump[7].number);
+                addr == FLASH_ADDR_PGJS_8_COUNT       ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_8_COUNT,Flas
+             -hCacheBuf.bump[7].count);
+                addr == FLASH_ADDR_PGJS_8_TYPE        ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_PGJS_8_TYPE,FlashC
+             -acheBuf.bump[7].type);
+              
+                //GNSS型号
+                addr == FLASH_ADDR_GNSS_MODEL         ? IapWriteByte(addr,value) : IapWriteByte(FLASH_ADDR_GNSS_MODEL,FlashCa
+             -cheBuf.gnss.model);
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              #endif
+ 777   1        
+ 778   1      }
+ 779          
+C51 COMPILER V9.60.0.0   BSP_FLASH                                                         09/20/2025 15:17:35 PAGE 22  
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =  11180    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    316       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,17 @@
+".\Objects\gpio.obj",
+".\Objects\flash.obj",
+".\Objects\usart.obj",
+".\Objects\timer.obj",
+".\Objects\bsp.obj",
+".\Objects\bsp_gpio.obj",
+".\Objects\bsp_usart.obj",
+".\Objects\bsp_flash.obj",
+".\Objects\bsp_mcu_id.obj",
+".\Objects\bsp_delay.obj",
+".\Objects\Signal.obj",
+".\Objects\Serial.obj",
+".\Objects\check.obj",
+".\Objects\gps.obj",
+".\Objects\main.obj" 
+TO ".\Objects\STC" 
+PRINT(".\Listings\STC.m51") RAMSIZE(256) 
